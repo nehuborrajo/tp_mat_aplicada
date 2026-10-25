@@ -132,3 +132,34 @@ forma garantizada bytes inmutables, locales de ejecución, swap ni copias del sn
 retenidas por otro código; la futura UI deberá limpiar sus propios widgets/estado.
 No se implementan autolock, portapapeles, bloqueo interproceso ni cancelación de
 workers. Servicio síncrono para uso secuencial, sin garantías entre hilos.
+
+## 10. Integración de acceso T-005
+
+El servicio sigue siendo síncrono y no seguro para llamadas superpuestas. Su único
+dueño en la aplicación es el worker serial del controlador: Tk no consulta estado
+directamente ni llama a lock mientras otro método está ejecutándose. Se rechazan
+dobles envíos y cambio de ruta/modo durante acceso o sesión abierta.
+
+La GUI valida maestra 1–1024 bytes UTF-8 sin recortar/normalizar y confirmación exacta
+al crear. Entradas ocultas, sin StringVar propio de maestra; se limpian al enviar,
+fallar validación, cambiar modo/archivo, bloquear y cerrar. El executor conserva el
+argumento solo mientras se ejecuta la operación; no hay cola de accesos con maestras.
+No se promete eliminación de copias internas de Tk, Python, swap o memoria del SO.
+
+No se retorna Future ni excepción al código visual: el worker convierte fallos en
+mensajes constantes y descarta su referencia a la maestra. Resultado de cola limitado
+a generación, estado y mensaje; nunca transporta snapshots ni claves. Ante fallo
+se bloquea el servicio antes de publicar el resultado. Una falta de sesión nunca
+se presenta como éxito. No se imprimen excepciones de worker ni se agregan logs.
+
+Bloqueo/cierre durante acceso invalida resultados y espera lock en el mismo worker.
+No hay cancelación forzada de PBKDF2 ni de la escritura. Una creación completada
+permanece como archivo cifrado aunque se descarte su acceso; no se borra ni revierte.
+La ventana indica la espera y permanece responsiva; no se permite reabrir antes de
+recibir confirmación. Si el SO o disco no responde, la espera no tiene plazo garantizado.
+
+No hay guardado ni modificaciones de credenciales desde T-005. Los fallos de creación,
+incluido conflicto/destino existente, dejan acceso bloqueado; unlock usa mensaje
+genérico. La gestión de guardar/editar deberá integrar los errores y pérdida de
+sesión de T-004 en T-006, sin permitir escrituras desde una sesión inválida.
+No se agregan permisos, archivos de preferencias, red ni recuperación de maestras.

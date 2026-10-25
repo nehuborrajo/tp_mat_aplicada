@@ -28,3 +28,21 @@ Al copiar mostrar toast `Contraseña copiada; se intentará limpiar en X segundo
 
 ## H. Estados de error
 Archivo inexistente, bloqueado, contraseña incorrecta, fallo de permisos, disco lleno, archivo corrupto/incompatible, parámetro inválido. Mensajes recuperables, nunca imprimir secretos; no sobrescribir archivo inválido silenciosamente.
+
+## I. Alcance visual efectivo de T-005
+
+Se implementan A/B con selector explícito Crear/Desbloquear, archivo editable y
+selección local. Al crear se avisa que no hay recuperación sin maestra; se exige
+confirmación. Al enviar se limpian los secretos y se deshabilitan entradas/acciones
+incompatibles mientras aparece progreso indeterminado.
+
+Tras autenticar solo se muestra «Sesión autenticada» y el estado pendiente de T-006;
+no se solicita ni renderiza contenido de credenciales. Bloquear vuelve al acceso
+vacío. Enter envía desde los campos; controles rotulados y contenido desplazable.
+El bloque Laboratorio Criptográfico obligatorio P0 permanece visible fuera del scroll,
+marcado pendiente de T-010; no se simulan operaciones didácticas aún no implementadas.
+
+Bloquear o Salir mientras se procesa muestra una espera responsiva y descarta
+cualquier resultado previo. Salir espera a que el servicio se bloquee para destruir
+la ventana. Una creación ya publicada puede quedar en disco; no se elimina.
+No se implementan C/D/E/G ni el contenido matemático de F en este ticket.

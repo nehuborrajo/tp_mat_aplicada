@@ -96,3 +96,11 @@ La clave no tiene acceso público ni se incluye en repr. `state` solo expone
 `bloqueada` o `desbloqueada`; `snapshot` devuelve el Vault inmutable tras autenticar.
 La sesión completa se descarta al bloquear o ante fallo de guardado.
 Ninguno de estos campos adicionales se serializa en el sobre persistente.
+
+## 8. Estado visual T-005 (solo memoria)
+
+El controlador gráfico conserva busy/unlocked/closing/closed y una generación para
+descartar resultados obsoletos. Es una proyección del estado obtenido por el worker,
+no una autorización alternativa de lectura/escritura: solo el servicio controla eso.
+La cola no contiene el Vault ni su clave. Ruta y modo no se persisten como preferencias.
+El formato de bóveda, AAD y políticas criptográficas T-002/T-003 no cambian.

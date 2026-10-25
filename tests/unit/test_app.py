@@ -28,5 +28,7 @@ def test_main_runs_event_loop(monkeypatch: pytest.MonkeyPatch) -> None:
     factory = Mock(return_value=window)
     monkeypatch.setattr("vaultlab.ui.main_window.create_window", factory)
     main()
-    factory.assert_called_once_with()
+    factory.assert_called_once()
+    assert factory.call_args.kwargs["path"].name == "vault.vault"
+    assert callable(factory.call_args.kwargs["service_factory"])
     window.mainloop.assert_called_once_with()

@@ -92,3 +92,26 @@ nonce nuevo; se actualiza la referencia solo después del éxito del repositorio
 Un fallo de guardado descarta la sesión. expected solo controla conflictos secuenciales,
 sin bloqueo interproceso. El servicio es síncrono y requiere acceso serializado;
 T-005 deberá ejecutarlo fuera del hilo UI sin permitir operaciones superpuestas.
+
+## 9. Acceso gráfico implementado en T-005
+
+- `app.py` ensambla VaultService y VaultRepository mediante una fábrica inyectada;
+  ruta inicial local `cwd/vault.vault`, sin configuración persistida.
+- `ui/access_controller.py`: executor de un worker, cola de resultados y generación
+  de operación. Todas las llamadas al servicio y su estado ocurren en ese worker,
+  incluida creación por la fábrica y bloqueo; no hay llamadas superpuestas.
+- `ui/access_view.py`: formulario en Tk, maestra/confirmación ocultas, validación
+  UTF-8 y confirmación exacta, selección de archivo, progreso y mensajes controlados.
+- `ui/main_window.py`: acceso desplazable, indicador fijo de laboratorio obligatorio
+  P0, aviso académico, bloqueo y cierre. Solo muestra un estado autenticado mínimo.
+
+El worker nunca toca widgets ni llama a after. Tk consulta la cola cada 40 ms;
+los resultados solo contienen generación, booleano de sesión, mensaje fijo y error.
+No se transfieren credenciales, claves, maestras ni objetos de excepción a la GUI.
+La vista no solicita snapshots ni llama a save: no hay operaciones de edición en T-005.
+
+Bloquear o cerrar invalida generaciones anteriores y encola lock en el mismo worker.
+Los resultados viejos se descartan incluso si ya estaban en cola. Durante la espera
+no se permite otro acceso; cerrar destruye la ventana tras confirmar el bloqueo.
+La destrucción directa de Tk tiene una limpieza de respaldo que encola lock y cierra
+el executor sin esperar en el hilo gráfico. No se modifica el servicio síncrono.

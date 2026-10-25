@@ -35,4 +35,8 @@
   162 pruebas con GUI aprobadas; Ruff, pip check y diff check correctos. Servicio de creación,
   desbloqueo autenticado, bloqueo y guardado del snapshot actual sin CRUD ni GUI.
   Informe y verificaciones en T004_REPORT.md y TEST_PLAN.md.
-- T-005 y siguientes: no iniciados; requieren nueva autorización explícita.
+- T-005 (2026-10-25): cerrado con revisión técnica favorable y revisión manual
+  confirmada por el usuario; vistas de acceso,
+  worker serial, progreso, errores y bloqueo/cierre coordinados. Evidencia en
+  T005_REPORT.md. Cierre y commit/push autorizados tras verificaciones satisfactorias.
+- T-006 y siguientes: no iniciados; requieren nueva autorización explícita.

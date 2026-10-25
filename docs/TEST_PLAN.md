@@ -252,3 +252,49 @@ La futura UI deberá serializar trabajo, tratar su cancelación y limpiar sus pr
 referencias; estas decisiones permanecen pendientes para su integración. Laboratorio
 Criptográfico obligatorio P0 y datos ficticios. Revisión manual de T-001 registrada
 como realizada por el usuario. T-005 no iniciado. Uso exclusivamente académico.
+
+## Evidencia T-005 — 2026-10-25
+
+T-005 autorizado posteriormente e implementado para revisión, sin commit/push.
+Informe: [T005_REPORT.md](T005_REPORT.md). Se conservan intactos dominio, motor,
+persistencia y servicio de T-001/T-004, sin nuevas dependencias.
+
+- `ruff check .`: correcto.
+- `pytest` con `VAULTLAB_TEST_GUI=1`: **188 aprobadas**, sin omisiones ni advertencias
+  (26 casos nuevos: 17 unitarios y 9 de GUI; 162 regresiones previas).
+- `pip check`: sin dependencias incompatibles.
+- `git diff --check`: sin errores en cambios de archivos ya versionados.
+
+Probados formulario real, creación, bloqueo, desbloqueo correcto e incorrecto,
+limpieza de campos, estados deshabilitados, archivos inválidos/conflictos y fallos
+de persistencia. Pruebas de barrera comprueban que Tk procesa eventos mientras el
+worker espera y que bloquear/cerrar descarta accesos tardíos, sin solapar servicio.
+La cola solo devuelve estado/mensajes controlados, sin datos sensibles ni excepciones.
+No existe guardado/CRUD desde UI; la seguridad de save sigue cubierta por regresión T-004.
+
+Se mantiene confirmación manual de T-001 aportada por el usuario. La revisión visual
+manual de la nueva UI T-005 queda pendiente; hay guía en el informe. Laboratorio
+obligatorio P0 visible y aún pendiente de su implementación matemática T-010.
+T-006 no iniciado. Solo datos ficticios y almacenamiento temporal en las pruebas.
+
+## Verificación definitiva y cierre de T-005 — 2026-10-25
+
+Revisión técnica favorable y revisión manual confirmada por el usuario («ya realice
+la revision manual»), sin incidencias reportadas. Esta confirmación actualiza la
+mención anterior de pendiente, sin atribuir al agente capturas o comprobaciones
+manuales no realizadas por él. No se detectaron correcciones funcionales necesarias.
+
+- `ruff check .`: correcto.
+- `pytest` con `VAULTLAB_TEST_GUI=1`: **188 aprobadas**, sin omisiones ni advertencias.
+- `pip check`: sin dependencias incompatibles.
+- `git diff --check`: correcto; se verifica también el diff preparado para el commit.
+- Fuentes, pruebas e informes de T-005 revisados para su inclusión; sin bóvedas,
+  claves, secretos reales, temporales, entornos, cachés ni artefactos generados.
+- Motor, servicio, dominio y contratos de almacenamiento previos permanecen intactos.
+
+Cierre, commit independiente y push autorizados. No quedan incidencias funcionales
+de T-005 pendientes; se mantienen las limitaciones del informe: espera de cierre,
+I/O sin plazo garantizado, limpieza de memoria best effort y ausencia de protección
+entre procesos. Laboratorio Criptográfico obligatorio P0 pendiente de T-010, con
+despliegue didáctico de operaciones matemáticas y datos exclusivamente ficticios.
+T-006 no iniciado y requiere nueva autorización. Uso exclusivamente académico.

@@ -145,3 +145,39 @@ No bloquean el bootstrap; deben resolverse antes de sus tickets respectivos:
   del hilo gráfico, control de acciones durante trabajo, tratamiento de cancelación
   y limpieza de widgets/referencias al bloquear. No ofrecer concurrencia no soportada
   ni mostrar trazas o secretos. Laboratorio Criptográfico obligatorio P0 sin cambios.
+
+## Alcance de T-005 revisado antes de implementar — 2026-10-25
+
+- Se implementan exclusivamente vistas crear/desbloquear, confirmación de maestra,
+  progreso, errores seguros y estado autenticado mínimo con bloqueo/cierre.
+  No tabla/CRUD, generador, portapapeles, save visible ni laboratorio adelantado.
+- La arquitectura pide worker y el servicio T-004 exige acceso secuencial: un único
+  executor serializa todas las llamadas al servicio, incluidas lock y consulta de
+  estado. Solo el hilo Tk toca widgets; recibe resultados sin secretos mediante cola.
+- Ruta inicial `vault.vault` en la carpeta de ejecución, editable/seleccionable mientras
+  está bloqueada; no se guarda configuración. El servicio/repositorio se ensamblan
+  en app.py, nunca se construye persistencia ni criptografía desde las vistas.
+- La GUI no obtiene snapshots de credenciales en este ticket. Solo muestra sesión
+  autenticada y el estado pendiente de T-006; no simula una tabla funcional.
+- Bloquear/Salir durante trabajo invalida resultados previos y encola lock en el
+  mismo worker. No se interrumpe PBKDF2 ni escritura atómica; GUI espera responsiva
+  y no publica éxito obsoleto. Si la creación ya se publicó, el archivo cifrado
+  permanece: no hay rollback ni borrado automático. Cerrar espera confirmación de lock.
+- Las entradas maestras se ocultan y limpian al enviar, cambiar modo, bloquear o
+  cerrar. UTF-8 sin recortar/normalizar, 1–1024 bytes; confirmación exacta al crear.
+  No se transfieren excepciones, contraseñas, claves ni snapshots en resultados GUI.
+- No se cambian motor, servicio ni contrato de almacenamiento T-002/T-004.
+  Conflicto de creación y fallos de persistencia conservan vista bloqueada; unlock
+  sigue genérico. No se agrega un flujo de guardado para probar conflictos de T-006.
+
+## Cierre autorizado de T-005 — 2026-10-25
+
+- Revisión técnica favorable y revisión manual confirmada por el usuario, sin
+  incidencias reportadas. No se detectan correcciones funcionales para este cierre.
+- Commit independiente y push autorizados después de repetir Ruff, Pytest con GUI,
+  pip check y diff check. T-006 no autorizado.
+- Permanecen documentadas las limitaciones de cierre sin interrupción forzada,
+  espera de I/O, limpieza de memoria best effort y ausencia de bloqueo entre procesos.
+  No se consideran bloqueos funcionales pendientes de T-005.
+- Laboratorio Criptográfico sigue obligatorio P0, pendiente de T-010, con despliegue
+  didáctico de operaciones matemáticas y datos exclusivamente ficticios.

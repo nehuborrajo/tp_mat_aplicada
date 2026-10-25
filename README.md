@@ -1,8 +1,8 @@
 # VaultLab — Administrador de Contraseñas Seguro
 
-**Estado:** T-001 a T-004 cerrados tras revisión: servicio de sesión autenticada, sin integración de bóveda en la GUI. Revisión manual de T-001 confirmada por el usuario. **Materia:** Matemática Aplicada — segundo parcial. **Idioma de producto y documentación:** español. **Objetivo:** aplicación local de escritorio para administrar credenciales en una bóveda cifrada, explicar su fundamento matemático y defenderla en vivo.
+**Estado:** T-001 a T-005 cerrados tras revisión: creación y desbloqueo desde la GUI, con operaciones en segundo plano. CRUD todavía no implementado. Revisiones manuales de T-001 y T-005 confirmadas por el usuario. **Materia:** Matemática Aplicada — segundo parcial. **Idioma de producto y documentación:** español. **Objetivo:** aplicación local de escritorio para administrar credenciales en una bóveda cifrada, explicar su fundamento matemático y defenderla en vivo.
 
-## Ejecutar la base de T-001 (Windows / PowerShell)
+## Ejecutar VaultLab (Windows / PowerShell)
 
 Requiere Python 3.12 o superior con Tk y una sesión gráfica de escritorio.
 Python + CustomTkinter son decisiones de diseño, no requisitos docentes.
@@ -28,9 +28,22 @@ Remove-Item Env:VAULTLAB_TEST_GUI
 La prueba GUI abre y cierra una ventana real; por defecto se omite explícitamente.
 La revisión manual consiste en iniciar la aplicación, comprobar textos y tamaños,
 redimensionar, acceder por teclado a «Salir» y cerrar sin errores.
-T-001 solo presenta una ventana base y el estado pendiente del laboratorio obligatorio.
-No captura contraseñas ni cifra, guarda o copia datos. Es una implementación académica:
-no usar credenciales reales. No se ha completado FR-011.
+T-005 permite crear o desbloquear una bóveda con maestra oculta y confirmación al crear.
+Es una implementación académica: usar exclusivamente maestras ficticias.
+No se ha completado FR-011: el laboratorio obligatorio P0 sigue visible como pendiente.
+
+1. Seleccionar «Crear bóveda» y elegir un archivo nuevo; la ruta inicial es
+   `vault.vault` en la carpeta desde la que se inicia la aplicación.
+2. Introducir y confirmar una maestra ficticia. Los campos se limpian al enviar.
+3. Esperar el progreso: la ventana sigue respondiendo durante derivación y guardado.
+4. Tras el éxito, usar «Bloquear» y luego «Desbloquear» con la misma maestra.
+   Todavía no hay tabla, edición ni copiado de credenciales (tickets posteriores).
+5. Ante error, volver a introducir la maestra; nunca se conserva como preferencia.
+
+«Bloquear» o «Salir» durante el trabajo esperan el bloqueo en el mismo worker.
+No interrumpen una escritura ni eliminan una bóveda que ya llegó a crearse.
+La configuración de ruta no se persiste. Informe y revisión manual sugerida en
+`docs/T005_REPORT.md`; la revisión manual de esta UI fue confirmada por el usuario.
 
 T-002 agrega PBKDF2-HMAC-SHA256 y AES-256-GCM mediante `cryptography`, solo en
 la capa interna. Para repetir la medición con ejemplos ficticios, sin mostrar claves:
@@ -46,12 +59,13 @@ T-003 incorpora modelos validados, un códec sin estado y `VaultRepository`.
 Solo se escribe el sobre cifrado; la maestra se utiliza en memoria. El repositorio
 no recibe credenciales ni contraseñas y rechaza la creación sobre un archivo existente.
 Informe de alcance, API, pruebas y límites: `docs/T003_REPORT.md`.
-No hay todavía flujo de creación/apertura desde la interfaz (T-005 pendiente).
+T-005 integra el flujo de creación/apertura en la interfaz sin modificar ese contrato.
 
 T-004 agrega `VaultService` con creación, desbloqueo autenticado, bloqueo y consulta
 de snapshot inmutable. `save()` recifra solo ese snapshot, requiere sesión autenticada
 y bloquea ante fallos; no hay todavía CRUD. La maestra no se conserva en la sesión.
 Informe: `docs/T004_REPORT.md`. Uso secuencial; sin garantías de concurrencia.
+T-005 respeta esa condición con un único worker y resultados de estado sin secretos.
 
 La documentación del proyecto, `AGENTS.md`, el código y `pyproject.toml` se versionan.
 Se excluyen entornos virtuales, cachés, temporales, compilados, `.env`, bóvedas y claves.
