@@ -1,0 +1,1 @@
+"""VaultLab: implementación académica local."""

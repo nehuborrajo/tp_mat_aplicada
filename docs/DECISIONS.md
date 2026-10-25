@@ -1,0 +1,60 @@
+# Registro de decisiones y preguntas
+
+## Confirmadas por fuente docente
+- SRC-01: Es obligatorio software funcional con GUI moderna y didáctica.
+- SRC-02: Tema 4: bóveda cifrada con algoritmo simétrico robusto derivado de contraseña maestra con PBKDF2 o Argon2; medidor de fortaleza, generador aleatorio, tabla/búsqueda/copiado seguro.
+- SRC-03: Paper con fundamentos matemáticos, arquitectura/GUI, diagramas, pruebas, conclusiones y referencias.
+- SRC-04: Exposición con demostración en vivo; tabla de evaluación 40% software, 25% paper, 35% exposición, nota ponderada >=6 y requisitos obligatorios de paper/GUI.
+
+## Propuestas técnicas pendientes de aprobación del equipo (no exigidas por cátedra)
+- D-001: Python + CustomTkinter (desktop Windows).
+- D-002: PBKDF2-HMAC-SHA256 y AES-256-GCM con biblioteca `cryptography`.
+- D-003: bóveda local única en archivo JSON envelope cifrado, datos serializados JSON internos.
+- D-004: solo uso educativo, sin nube ni recuperación maestra.
+- D-005: credenciales con `name,username,password,url,notes` y UUID.
+- D-006: timeout de limpieza de portapapeles y bloqueo por inactividad (P1).
+- D-007: tickets independientes y aprobación del usuario antes de avanzar o commitear.
+
+## Preguntas abiertas para profesor/equipo
+1. Instructivo general: duración exposición **hasta 25 minutos**; tabla de evaluación refiere **15 minutos**. Confirmar duración real.
+2. Consigna individual antigua: generador/medidor aparecen como secundarios; general actualizado los incluye en GUI. Se adopta general como obligatorio salvo aclaración docente.
+3. Consigna individual usa expresión "clave privada" para desbloqueo, mientras general exige clave derivada de contraseña maestra y cifrado simétrico. Interpretar como secreto de acceso/clave maestra derivada y solicitar confirmación si la cátedra exige algo diferente.
+4. ¿Debe existir entrega previa de ficha de inscripción con stack, integrantes y alcance? General dice sí; confirmar fecha y formato.
+5. ¿El docente exige demostración paso a paso de parámetros matemáticos o algún algoritmo particular? No especifica para tema 4 aparte de PBKDF2/Argon2.
+6. ¿Sistema operativo de demostración y cantidad de integrantes? Definir para pruebas/roles.
+7. Calibración PBKDF2: medir objetivo de demora razonable en hardware real, especificar mínimo y máximos seguros; no inventar iteraciones sin benchmark.
+
+## Restricciones comunicacionales
+No llamar "producto seguro para uso real" ni prometer borrado del portapapeles/memoria; son límites explícitos de esta propuesta.
+
+## Ejecución de T-001 — 2026-10-25
+
+- La autorización de T-001 permite adoptar D-001 para la ventana base: Python >=3.12
+  y CustomTkinter 5.2.2. Se usa setuptools, estructura `src`, Ruff y Pytest.
+  No implica aprobación de parámetros criptográficos ni implementación de T-002.
+- `app` no carga Tk al importarse; la ventana se construye solo al arrancar.
+  Las capas restantes son paquetes vacíos documentados, sin dependencias entre ellas.
+- El laboratorio obligatorio aparece identificado en la ventana como pendiente de T-010.
+  No se simulan operaciones ni se declara cumplido FR-011 en este bootstrap.
+- No se incorporan formularios, secretos, persistencia, red ni telemetría.
+- Por la autorización posterior de revisión de T-001, se retiran las exclusiones de
+  los documentos iniciales: README, AGENTS, CODEX_HANDOFF y docs se versionan.
+  Se mantienen exclusiones de entornos, cachés, temporales y archivos de bóveda/claves.
+- La GUI se prueba por activación explícita con `VAULTLAB_TEST_GUI=1`; un fallo gráfico
+  con esa opción activa debe fallar el test, no omitirse silenciosamente.
+
+## Inconsistencias detectadas antes de T-001
+
+No bloquean el bootstrap; deben resolverse antes de sus tickets respectivos:
+
+- FR-013 está marcado P1 aunque el rechazo de alteraciones ya es parte de FR-002 (P0)
+  y de AES-GCM en T-002. No postergar la autenticación del cifrado.
+- D-006 agrupa limpieza de portapapeles y autolock como P1, pero FR-007/T-009 exigen
+  la limpieza condicional como P0. Distinguir ambas funciones al implementar.
+- FR-011 pide una salida derivada ficticia visible; SECURITY/UX prohíben mostrar claves
+  sin distinguir siempre las demostrativas de las reales. Aclarar antes de T-010;
+  en T-001 no se genera ni muestra ninguna clave.
+- La pregunta 5 sobre didáctica no hace opcional el laboratorio: AGENTS y FR-011
+  lo establecen como obligatorio. Queda abierta la profundidad docente específica.
+- Las fuentes originales PDF/DOCX no están presentes; la trazabilidad académica actual
+  depende de la transcripción en estos documentos, sin auditoría literal del original.

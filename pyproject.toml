@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vaultlab"
+version = "0.1.0"
+description = "Administrador de contraseñas académico, local y de escritorio."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = ["customtkinter==5.2.2"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.3,<10", "ruff>=0.9,<1"]
+
+[project.gui-scripts]
+vaultlab = "vaultlab.app:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+markers = ["gui: requiere una sesión gráfica local"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+extend-exclude = [".tmp", "pytest-cache-files-*"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

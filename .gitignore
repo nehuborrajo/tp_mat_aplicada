@@ -1,0 +1,18 @@
+# Entornos, herramientas y artefactos locales.
+.venv/
+.tmp/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+pytest-cache-files-*/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+.env
+.env.*
+*.vault
+*.vault.*
+*.key
