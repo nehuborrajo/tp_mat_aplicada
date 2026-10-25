@@ -104,3 +104,31 @@ de memoria. No se introducen copias de seguridad ni recuperación maestra.
 Referencias de operaciones de archivo:
 [os.replace / os.link](https://docs.python.org/3/library/os.html#os.replace) y
 [tempfile.mkstemp](https://docs.python.org/3/library/tempfile.html#tempfile.mkstemp).
+
+## 9. Sesión autenticada implementada en T-004
+
+El servicio no conserva la contraseña maestra. Tras leer/validar el sobre, deriva,
+autentica y valida el interior; solo entonces instala la sesión con modelo, clave
+derivada y paquete autenticado. Al crear verifica también el paquete vacío generado
+y espera la publicación exclusiva antes de abrir sesión. No hay hash verificador
+separado ni cambios a los parámetros de T-002 o al formato/repositorio de T-003.
+
+Un estado bloqueado impide acceder al snapshot y llamar a save. La creación vacía
+con maestra validada es la única escritura sin una sesión preexistente; no puede
+sobrescribir un destino existente. No hay métodos de modificación de credenciales.
+El guardado sin argumentos acepta únicamente el snapshot interno de la sesión;
+expected proviene de una autenticación previa válida o de un guardado confiable
+de esa misma sesión. Ningún paquete recibido del exterior se convierte por sí solo
+en autorización de escritura. El repositorio verifica el control secuencial T-003.
+
+Errores de unlock (maestra, formato, autenticación, archivo ausente o lectura) usan
+el mismo mensaje «No se pudo desbloquear la bóveda.». Creación distingue entrada,
+destino existente e I/O con mensajes fijos. Guardado distingue conflicto de fallo
+general, siempre descarta la sesión y exige volver a desbloquear. No se registran
+entradas, claves, modelos ni causas originales; se suprime la cadena visible.
+
+lock es idempotente y quita las referencias de sesión del servicio. No borra de
+forma garantizada bytes inmutables, locales de ejecución, swap ni copias del snapshot
+retenidas por otro código; la futura UI deberá limpiar sus propios widgets/estado.
+No se implementan autolock, portapapeles, bloqueo interproceso ni cancelación de
+workers. Servicio síncrono para uso secuencial, sin garantías entre hilos.

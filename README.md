@@ -1,6 +1,6 @@
 # VaultLab — Administrador de Contraseñas Seguro
 
-**Estado:** T-001 a T-003 implementados: ventana base, motor criptográfico y persistencia cifrada; sin servicio de sesión ni integración de bóveda en la GUI. T-003 cerrado tras revisión favorable. **Materia:** Matemática Aplicada — segundo parcial. **Idioma de producto y documentación:** español. **Objetivo:** aplicación local de escritorio para administrar credenciales en una bóveda cifrada, explicar su fundamento matemático y defenderla en vivo.
+**Estado:** T-001 a T-004 cerrados tras revisión: servicio de sesión autenticada, sin integración de bóveda en la GUI. Revisión manual de T-001 confirmada por el usuario. **Materia:** Matemática Aplicada — segundo parcial. **Idioma de producto y documentación:** español. **Objetivo:** aplicación local de escritorio para administrar credenciales en una bóveda cifrada, explicar su fundamento matemático y defenderla en vivo.
 
 ## Ejecutar la base de T-001 (Windows / PowerShell)
 
@@ -46,7 +46,12 @@ T-003 incorpora modelos validados, un códec sin estado y `VaultRepository`.
 Solo se escribe el sobre cifrado; la maestra se utiliza en memoria. El repositorio
 no recibe credenciales ni contraseñas y rechaza la creación sobre un archivo existente.
 Informe de alcance, API, pruebas y límites: `docs/T003_REPORT.md`.
-No hay todavía flujo de creación/apertura desde la interfaz (T-004/T-005 pendientes).
+No hay todavía flujo de creación/apertura desde la interfaz (T-005 pendiente).
+
+T-004 agrega `VaultService` con creación, desbloqueo autenticado, bloqueo y consulta
+de snapshot inmutable. `save()` recifra solo ese snapshot, requiere sesión autenticada
+y bloquea ante fallos; no hay todavía CRUD. La maestra no se conserva en la sesión.
+Informe: `docs/T004_REPORT.md`. Uso secuencial; sin garantías de concurrencia.
 
 La documentación del proyecto, `AGENTS.md`, el código y `pyproject.toml` se versionan.
 Se excluyen entornos virtuales, cachés, temporales, compilados, `.env`, bóvedas y claves.

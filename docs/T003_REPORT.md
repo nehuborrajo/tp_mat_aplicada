@@ -1,5 +1,9 @@
 # Informe técnico T-003 — 2026-10-25
 
+Nota posterior: revisión visual manual de T-001 confirmada como realizada por el
+usuario al autorizar T-004. Las menciones de pendiente más abajo reflejan el estado
+histórico al cerrar T-003; el registro vigente está en TEST_PLAN.md.
+
 Estado: cerrado tras revisión favorable y verificaciones finales; commit y push
 autorizados por el usuario. T-004 no iniciado. Resultados definitivos en TEST_PLAN.md.
 

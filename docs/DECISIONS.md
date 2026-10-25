@@ -107,3 +107,41 @@ No bloquean el bootstrap; deben resolverse antes de sus tickets respectivos:
 - Las exclusiones iniciales de AGENTS.md, README.md, CODEX_HANDOFF.md y docs/ ya
   fueron retiradas al cerrar T-001. Se confirma su seguimiento en Git; se conservan
   las exclusiones de bóvedas, claves, entornos, temporales y artefactos generados.
+
+## Alcance de T-004 revisado antes de implementar — 2026-10-25
+
+- Usuario confirma realizada la revisión manual de T-001. Se registra como evidencia
+  aportada por el usuario, sin inventar capturas ni resultados detallados.
+- La arquitectura enumera métodos del servicio completo, incluido CRUD, pero el
+  backlog de T-004 se limita a crear/desbloquear/bloquear, estados y mensajes.
+  Se implementan esos casos, lectura de snapshot inmutable y `save()` sin argumentos
+  para volver a persistir el snapshot ya autenticado. No admite sustitución de modelo,
+  CRUD, búsquedas, autolock, workers ni GUI; siguen en sus tickets respectivos.
+- La persistencia inicial es la excepción necesaria: create_vault construye una bóveda
+  vacía con maestra validada y autentica el paquete generado antes de publicarlo.
+  Un archivo existente nunca se modifica sin previo desbloqueo autenticado válido.
+- Sesión privada única: modelo, clave derivada y paquete autenticado previo. No se
+  conserva la maestra. Publicar la sesión solo tras éxito completo; al bloquear se
+  descarta su referencia. No se promete borrado seguro de memoria ni revocar copias
+  del snapshot que otro código haya retenido.
+- Fallo de apertura: bloqueado y error genérico, sin distinguir maestra/alteración/
+  formato/lectura. Fallo de guardado: bloquear y exigir reapertura; conflicto separado
+  sin sobrescribir archivos. Operaciones crear/desbloquear con sesión abierta se
+  rechazan; lock es idempotente. Acceso secuencial en un proceso, sin garantía de hilos.
+- T-002 y contratos T-003 permanecen intactos. Se compone directamente derivación,
+  cifrado y serializers existentes para derivar una sola vez y retener solo la clave.
+  La GUI futura deberá serializar operaciones y ejecutar trabajo costoso fuera de UI.
+
+## Cierre autorizado de T-004 — 2026-10-25
+
+- Revisión favorable recibida; commit independiente y push autorizados tras repetir
+  las verificaciones. T-005 sigue sin autorización.
+- Lectura de credenciales y guardado requieren sesión autenticada. Excepciones
+  necesarias y explícitas: unlock lee el sobre cifrado para autenticar; create_vault
+  autentica un paquete vacío nuevo y lo publica exclusivamente antes de abrir sesión.
+- Fallos de guardado descartan sesión; la maestra nunca forma parte del estado
+  retenido. Las limitaciones de memoria y acceso secuencial permanecen vigentes.
+- Para la futura UI siguen pendientes serialización de operaciones síncronas fuera
+  del hilo gráfico, control de acciones durante trabajo, tratamiento de cancelación
+  y limpieza de widgets/referencias al bloquear. No ofrecer concurrencia no soportada
+  ni mostrar trazas o secretos. Laboratorio Criptográfico obligatorio P0 sin cambios.

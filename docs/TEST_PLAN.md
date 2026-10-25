@@ -197,3 +197,58 @@ Se mantienen los límites del informe. Laboratorio Criptográfico obligatorio P0
 con operaciones matemáticas didácticas y datos ficticios, aún pendiente de su ticket.
 La revisión visual manual de T-001 continúa pendiente; la prueba gráfica automática
 no la sustituye. Uso exclusivamente académico.
+
+## Revisión manual de T-001 confirmada — 2026-10-25
+
+Al autorizar T-004, el usuario informó «revision manual de t-001 hecha».
+Se registra la revisión como realizada por el usuario; no se inventan capturas,
+detalles por control ni una nueva inspección visual del agente. Este registro
+actualiza las menciones históricas de pendiente de T-001 en informes anteriores.
+
+## Evidencia T-004 — 2026-10-25
+
+Implementado para revisión, sin commit/push ni T-005. Informe: [T004_REPORT.md](T004_REPORT.md).
+Se prueba creación, desbloqueo, bloqueo, reapertura, guardado del snapshot autenticado,
+rechazo de operaciones bloqueadas/incompatibles, maestra incorrecta, archivos inválidos,
+conflicto de actualización y fallos reales de persistencia con conservación de disco.
+Pruebas unitarias comprueban ausencia de sesión parcial, logs y carga de GUI.
+Solo datos ficticios; motor T-002 y contratos T-003 intactos.
+
+Resultados finales sobre Windows 11 / NTFS, Python 3.14.7, cryptography 49.0.0,
+CustomTkinter 5.2.2, Pytest 9.1.1 y Ruff 0.17.2:
+
+- `ruff check .`: correcto.
+- `pytest` con `VAULTLAB_TEST_GUI=1`: **162 aprobadas**, sin omisiones ni advertencias
+  (38 casos nuevos respecto de T-003: 27 unitarios y 11 de integración).
+- `pip check`: sin dependencias incompatibles.
+- `git diff --check`: sin errores de espacios en cambios de archivos versionados.
+- Sin cambios a crypto/storage/domain/ui ni pyproject.toml. Sin archivos de bóveda,
+  secretos reales ni temporales agregados al control de versiones; sin staging ni commit.
+
+Laboratorio Criptográfico conserva prioridad P0 y visualización matemática obligatoria
+con datos ficticios. Servicio sin GUI y sin garantías entre hilos/procesos; memoria
+solo best effort. T-005 no iniciado y requiere nueva autorización.
+
+## Verificación definitiva y cierre de T-004 — 2026-10-25
+
+Revisión favorable y autorización de commit independiente/push recibidas.
+
+- `ruff check .`: correcto.
+- `pytest` con `VAULTLAB_TEST_GUI=1`: **162 aprobadas**, sin omisiones ni advertencias.
+- `pip check`: sin dependencias incompatibles.
+- `git diff --check`: correcto; se verifica también el diff preparado para commit.
+- Confirmado por inspección y pruebas: snapshot/save bloqueados sin sesión válida;
+  el fallo de guardado descarta la sesión y exige un nuevo desbloqueo. La creación
+  inicial autentica el paquete vacío antes de publicarlo; unlock solo lee el sobre
+  cifrado antes de autenticar, sin exponer credenciales ni estado parcial.
+- La sesión no contiene maestra. Sin logs/prints ni secretos en errores controlados;
+  modelo, clave y paquete previo privados, sin exposición por repr de sesión.
+- Inventario de fuentes, pruebas y documentación revisado para incluir T-004 completo;
+  se excluyen bóvedas, secretos, temporales, entornos, cachés y artefactos generados.
+- T-002 y los contratos T-003 permanecen intactos; sin cambios de GUI o dependencias.
+
+Se conservan los límites de memoria, operaciones síncronas y acceso secuencial.
+La futura UI deberá serializar trabajo, tratar su cancelación y limpiar sus propias
+referencias; estas decisiones permanecen pendientes para su integración. Laboratorio
+Criptográfico obligatorio P0 y datos ficticios. Revisión manual de T-001 registrada
+como realizada por el usuario. T-005 no iniciado. Uso exclusivamente académico.

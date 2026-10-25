@@ -88,3 +88,11 @@ Se conserva además el máximo global de 16 MiB para el JSON interno codificado.
 
 El parser del interior solo se llama después de autenticar el ciphertext completo.
 No hay migraciones, importación ni recuperación de contraseña maestra perdida.
+
+## 7. Sesión T-004 (solo memoria, sin cambios al archivo v1)
+
+La sesión privada contiene `vault`, `key` y `previous`; no contiene la maestra.
+La clave no tiene acceso público ni se incluye en repr. `state` solo expone
+`bloqueada` o `desbloqueada`; `snapshot` devuelve el Vault inmutable tras autenticar.
+La sesión completa se descarta al bloquear o ante fallo de guardado.
+Ninguno de estos campos adicionales se serializa en el sobre persistente.

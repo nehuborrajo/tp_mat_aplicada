@@ -1,1 +1,1 @@
-"""Casos de uso independientes de la interfaz; pendientes de implementación."""
+"""Casos de uso independientes de GUI: creación, autenticación y sesión de bóveda."""

@@ -69,3 +69,26 @@ un archivo que ya difiera de él; no se implementa bloqueo interproceso.
 El códec pertenece al adaptador de representación, no crea/desbloquea una sesión.
 `services/` y la GUI no se modifican en T-003; los casos de uso siguen en T-004.
 La criptografía no depende de dominio, almacenamiento ni interfaz.
+
+## 8. Servicio implementado en T-004
+
+`VaultService` depende de `VaultRepositoryPort` (read/create/save de paquetes
+cifrados) y compone las primitivas/serializers existentes. El repositorio concreto
+de T-003 satisface el protocolo sin modificaciones. No cambia el códec sin estado
+de T-003: el servicio deriva una sola vez para conservar la clave de la sesión.
+
+Métodos de este ticket: create_vault, unlock, lock y save sin argumentos; propiedades
+state y snapshot de solo lectura. No hay list/add/update/delete ni reemplazo público
+del snapshot. CRUD sigue reservado para T-006 y las vistas para T-005.
+
+La sesión privada contiene el modelo inmutable, clave derivada y paquete previo.
+Solo se instala al terminar autenticación/validación y, al crear, persistencia.
+lock descarta toda la referencia. El estado se calcula desde la presencia de sesión,
+sin una bandera independiente que pueda quedar inconsistente.
+
+save exige sesión y usa como expected el paquete autenticado previamente o el último
+generado y guardado exitosamente en esa sesión. El paquete siguiente se cifra con
+nonce nuevo; se actualiza la referencia solo después del éxito del repositorio.
+Un fallo de guardado descarta la sesión. expected solo controla conflictos secuenciales,
+sin bloqueo interproceso. El servicio es síncrono y requiere acceso serializado;
+T-005 deberá ejecutarlo fuera del hilo UI sin permitir operaciones superpuestas.

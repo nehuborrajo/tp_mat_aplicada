@@ -20,8 +20,8 @@
 ## Estado de ejecución
 
 - T-001 (2026-10-25): implementados bootstrap, ventana base y pruebas. Ruff y tres
-  tests con GUI pasan; arranque gráfico detectado. Revisión visual manual pendiente
-  por fallo de la herramienta de escritorio; detalles en `TEST_PLAN.md`.
+  tests con GUI pasan; arranque gráfico detectado. Revisión visual manual realizada,
+  confirmada por el usuario al autorizar T-004; detalles en `TEST_PLAN.md`.
 - T-002 (2026-10-25): implementadas primitivas, política de parámetros, AAD y
   pruebas adversas; revisión técnica final satisfactoria, 54 pruebas aprobadas,
   Ruff y pip check correctos. Commit/push autorizados. Calibración y evidencia en
@@ -31,4 +31,8 @@
   124 pruebas con GUI aprobadas, Ruff y pip check correctos. Evidencias en
   T003_REPORT.md y TEST_PLAN.md. T-004 deberá autenticar el snapshot previo antes
   de autorizar modificaciones; expected solo controla conflictos en acceso secuencial.
-- T-004 y siguientes: no iniciados; requieren nueva autorización explícita.
+- T-004 (2026-10-25): cerrado con revisión favorable y autorización de commit/push;
+  162 pruebas con GUI aprobadas; Ruff, pip check y diff check correctos. Servicio de creación,
+  desbloqueo autenticado, bloqueo y guardado del snapshot actual sin CRUD ni GUI.
+  Informe y verificaciones en T004_REPORT.md y TEST_PLAN.md.
+- T-005 y siguientes: no iniciados; requieren nueva autorización explícita.
