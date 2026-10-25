@@ -1,1 +1,1 @@
-"""Modelos de dominio; pendientes de tickets posteriores."""
+"""Modelos tipados y validación del snapshot lógico de bóveda."""

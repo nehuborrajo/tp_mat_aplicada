@@ -26,4 +26,9 @@
   pruebas adversas; revisión técnica final satisfactoria, 54 pruebas aprobadas,
   Ruff y pip check correctos. Commit/push autorizados. Calibración y evidencia en
   TEST_PLAN.md. Sin persistencia ni UI criptográfica. Laboratorio obligatorio P0 pendiente.
-- T-003 y siguientes: no iniciados; requieren nueva autorización explícita.
+- T-003 (2026-10-25): cerrado con revisión favorable y autorización de commit/push;
+  modelo, formato, códec sin estado y repositorio cifrado. Verificaciones finales:
+  124 pruebas con GUI aprobadas, Ruff y pip check correctos. Evidencias en
+  T003_REPORT.md y TEST_PLAN.md. T-004 deberá autenticar el snapshot previo antes
+  de autorizar modificaciones; expected solo controla conflictos en acceso secuencial.
+- T-004 y siguientes: no iniciados; requieren nueva autorización explícita.

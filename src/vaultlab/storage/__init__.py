@@ -1,1 +1,1 @@
-"""Persistencia local reservada para T-003."""
+"""Formato estricto, códec sin estado y persistencia local exclusivamente cifrada."""

@@ -1,6 +1,6 @@
 # VaultLab — Administrador de Contraseñas Seguro
 
-**Estado:** T-001 y T-002 implementados: ventana base y primitivas criptográficas probadas en memoria; sin bóveda persistente ni integración de criptografía en la GUI. **Materia:** Matemática Aplicada — segundo parcial. **Idioma de producto y documentación:** español. **Objetivo:** aplicación local de escritorio para administrar credenciales en una bóveda cifrada, explicar su fundamento matemático y defenderla en vivo.
+**Estado:** T-001 a T-003 implementados: ventana base, motor criptográfico y persistencia cifrada; sin servicio de sesión ni integración de bóveda en la GUI. T-003 cerrado tras revisión favorable. **Materia:** Matemática Aplicada — segundo parcial. **Idioma de producto y documentación:** español. **Objetivo:** aplicación local de escritorio para administrar credenciales en una bóveda cifrada, explicar su fundamento matemático y defenderla en vivo.
 
 ## Ejecutar la base de T-001 (Windows / PowerShell)
 
@@ -41,6 +41,12 @@ la capa interna. Para repetir la medición con ejemplos ficticios, sin mostrar c
 
 La medición no altera la configuración. Parámetros, límites, AAD y evidencia en
 `docs/SECURITY.md`, `docs/DATA_MODEL.md` y `docs/TEST_PLAN.md`.
+
+T-003 incorpora modelos validados, un códec sin estado y `VaultRepository`.
+Solo se escribe el sobre cifrado; la maestra se utiliza en memoria. El repositorio
+no recibe credenciales ni contraseñas y rechaza la creación sobre un archivo existente.
+Informe de alcance, API, pruebas y límites: `docs/T003_REPORT.md`.
+No hay todavía flujo de creación/apertura desde la interfaz (T-004/T-005 pendientes).
 
 La documentación del proyecto, `AGENTS.md`, el código y `pyproject.toml` se versionan.
 Se excluyen entornos virtuales, cachés, temporales, compilados, `.env`, bóvedas y claves.

@@ -15,4 +15,5 @@ dist/
 .env.*
 *.vault
 *.vault.*
+.*.vault.*.tmp
 *.key

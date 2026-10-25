@@ -80,3 +80,30 @@ No bloquean el bootstrap; deben resolverse antes de sus tickets respectivos:
   es necesario para FR-002 y para el cifrado autenticado obligatorio.
 - La calibración debe repetirse en el equipo de defensa. No hay reducción automática
   del coste ni migración de bóvedas. Persistencia y parseo seguro pertenecen a T-003.
+
+## Alcance de T-003 revisado antes de implementar — 2026-10-25
+
+- Autorización exclusiva de T-003, sin commit/push. La petición de creación y apertura
+  con maestra se superpone con los casos de uso de T-004. Se resuelve con un códec
+  puro `seal_vault`/`open_vault`, sin estado ni sesión; repositorio solo de paquetes
+  cifrados. `VaultService`, bloqueo, CRUD e integración GUI siguen fuera de alcance.
+- D-003/D-005 se concretan para modelo/serialización v1 bajo esta autorización.
+  No son exigencias docentes adicionales. Límites explícitos se fijan en DATA_MODEL.
+- Los documentos no fijaban protección al crear sobre un archivo existente ni ante
+  cambios externos: creación exclusiva y guardado condicionado a un paquete previo
+  leído; archivo alterado/corrupto no se sobrescribe silenciosamente.
+- Atomicidad no equivale a durabilidad absoluta ante corte eléctrico. Se usará
+  temporal cifrado, flush/fsync y reemplazo; creación exclusiva mediante enlace duro
+  del temporal completo (NTFS/POSIX). No se admite guardado concurrente entre procesos.
+- El laboratorio FR-011 conserva prioridad P0 y sus operaciones didácticas visibles
+  con datos ficticios; esta infraestructura no lo da por implementado.
+
+## Cierre autorizado de T-003 — 2026-10-25
+
+- Revisión favorable recibida; autorización posterior de commit independiente y push.
+- Confirmado: `save(packet, expected=previous)` solo controla conflictos en acceso
+  secuencial, sin garantías interproceso. T-004 deberá autenticar previous antes de
+  autorizar modificaciones; no se inicia T-004 bajo esta autorización.
+- Las exclusiones iniciales de AGENTS.md, README.md, CODEX_HANDOFF.md y docs/ ya
+  fueron retiradas al cerrar T-001. Se confirma su seguimiento en Git; se conservan
+  las exclusiones de bóvedas, claves, entornos, temporales y artefactos generados.

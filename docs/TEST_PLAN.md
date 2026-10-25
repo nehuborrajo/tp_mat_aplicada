@@ -156,3 +156,44 @@ criptográfica. Revisión visual manual de T-001 aún pendiente. FR-011 / Labora
 Criptográfico sigue obligatorio **P0**: deberá explicar visiblemente las operaciones
 matemáticas internas con ejemplos ficticios; T-002 no lo sustituye ni lo da por cumplido.
 T-003 no está autorizado. Solo uso académico, sin credenciales reales.
+
+## Evidencia T-003 — 2026-10-25
+
+T-003 autorizado posteriormente, implementado y pendiente de revisión sin commit/push.
+Informe detallado: [T003_REPORT.md](T003_REPORT.md).
+
+- Ruff: correcto.
+- Pytest con `VAULTLAB_TEST_GUI=1`: **124 aprobadas**, sin omisiones ni advertencias.
+- pip check: sin dependencias incompatibles.
+- git diff --check: correcto en cambios de archivos ya versionados.
+
+Se verifican persistencia/reapertura, guardado, autenticación, formato adverso,
+ausencia de texto plano en temporal/final y conservación del archivo anterior al
+inyectar fallos de escritura, escritura corta, flush, fsync y reemplazo.
+Pruebas con datos ficticios en tmp_path, sin cambios a GUI ni servicios.
+La revisión visual manual previa permanece pendiente. T-004 no iniciado.
+
+## Verificación definitiva y cierre de T-003 — 2026-10-25
+
+Revisión favorable del usuario y autorización de commit/push recibidas.
+
+- `ruff check .`: correcto.
+- `pytest` con `VAULTLAB_TEST_GUI=1`: **124 aprobadas**, sin omisiones ni advertencias.
+- `pip check`: sin dependencias incompatibles.
+- `git diff --check`: sin errores; se verifica también el diff preparado para commit.
+- Inventario de T-003 revisado: fuentes, pruebas, informe y documentos incluidos.
+  No se incluyen bóvedas, temporales, claves, `.env`, entornos ni cachés. Todos los
+  ejemplos de pruebas son ficticios; no se incorporan credenciales reales.
+- Documentación inicial (AGENTS, README, CODEX_HANDOFF y docs) versionable y seguida
+  por Git; sus exclusiones originales ya habían sido retiradas en T-001.
+- Confirmado por inspección y pruebas: cada cifrado solicita nonce CSPRNG nuevo,
+  y `open_vault` autentica antes de interpretar el JSON interno.
+- `repository.save(packet, expected=previous)` conserva su contrato de control de
+  conflictos para un proceso con acceso secuencial. No garantiza concurrencia entre
+  procesos. El llamador debe autenticar previous antes de autorizar modificaciones;
+  T-004 queda obligado a respetarlo y aún no se inicia.
+
+Se mantienen los límites del informe. Laboratorio Criptográfico obligatorio P0,
+con operaciones matemáticas didácticas y datos ficticios, aún pendiente de su ticket.
+La revisión visual manual de T-001 continúa pendiente; la prueba gráfica automática
+no la sustituye. Uso exclusivamente académico.

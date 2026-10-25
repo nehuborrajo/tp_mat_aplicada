@@ -54,3 +54,37 @@ parámetro autenticado debe invalidar el tag o provocar rechazo previo de format
 La cifra `iterations: 0` del ejemplo continúa siendo inválida. Coste inicial
 2.400.000; intervalo aceptado 600.000–5.000.000. Sal 16–64 bytes, nonce 12 bytes,
 clave 32 bytes y contenido cifrado entre 16 y 16 MiB + 16 bytes.
+
+## 6. Implementación y límites de T-003 (decisiones de diseño)
+
+Se implementa el contrato anterior sin cambiar el AAD de T-002. Formato de sobre
+exacto, sin campos adicionales; algoritmos y versión solo los indicados en v1.
+Base64 estándar canónico con padding, sin espacios ni caracteres extra.
+Archivo externo máximo 24 MiB, leído con límite de 24 MiB + 1 para detectar exceso;
+ciphertext máximo 16 MiB + 16 bytes. No se deriva ninguna clave al leer el sobre.
+
+JSON UTF-8 estricto: se rechazan claves duplicadas, floats, NaN/Infinity, enteros
+de más de 10 caracteres y anidamiento superior a 8 antes de invocar el parser JSON.
+Se rechazan campos faltantes/extra, booleanos como versión o iteraciones y tipos
+incorrectos. Se acota longitud Base64 antes de decodificar y resultado después.
+
+Interior: campos exactos `schema_version` (entero 1) y `credentials` (lista de hasta
+10.000 entradas). Cada entrada contiene exactamente todos los campos del ejemplo;
+los opcionales pueden ser cadenas vacías, sin omitir claves. Límites en caracteres:
+
+| Campo | Límite |
+|---|---|
+| name | 256; no vacío ni compuesto solo por espacios |
+| username | 512 |
+| password | 1024; no vacío, sin recortar ni normalizar |
+| url | 2048 |
+| notes | 4096 |
+
+Textos codificables en UTF-8; UUID canónico en minúsculas y único dentro de la bóveda;
+fechas ISO-8601 con `T`, zona UTC y máximo 40 caracteres; actualización no anterior
+a creación. No se realiza acceso a URLs ni modificación automática de fechas.
+`Vault` usa tupla de credenciales para mantener snapshots inmutables.
+Se conserva además el máximo global de 16 MiB para el JSON interno codificado.
+
+El parser del interior solo se llama después de autenticar el ciphertext completo.
+No hay migraciones, importación ni recuperación de contraseña maestra perdida.

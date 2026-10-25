@@ -51,3 +51,21 @@ src/vaultlab/
 
 ## 6. Decisiones de diseño
 Sin servidor ni DB, no persistir plaintext temporal, servicios aislables para tests, un archivo cifrado por instalación/demo. Diseño de `password_strength` debe dejar claro que una puntuación heurística no equivale a entropía real de contraseñas humanas.
+
+## 7. Implementación de infraestructura T-003
+
+- `domain/models.py`: snapshots inmutables `Credential` y `Vault`, validación sin I/O.
+- `storage/format.py`: serialización y parseo estrictos de sobre e interior, en memoria.
+- `storage/vault_codec.py`: adaptador puro `seal_vault`/`open_vault`; transforma el
+  snapshot usando el motor de T-002, sin archivos, caché de claves ni estado de sesión.
+- `storage/vault_repository.py`: creación exclusiva, lectura y guardado atómico de
+  `EncryptedData`; nunca acepta el modelo en claro ni la contraseña maestra.
+
+La composición comprobada es `Vault → seal_vault → repository.create/save` y
+`repository.read → open_vault → Vault`. La aplicación futura debe autenticar el
+snapshot leído antes de autorizar cambios. El guardado recibe `expected` y rechaza
+un archivo que ya difiera de él; no se implementa bloqueo interproceso.
+
+El códec pertenece al adaptador de representación, no crea/desbloquea una sesión.
+`services/` y la GUI no se modifican en T-003; los casos de uso siguen en T-004.
+La criptografía no depende de dominio, almacenamiento ni interfaz.

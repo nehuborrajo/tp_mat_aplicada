@@ -62,3 +62,45 @@ Fuentes consultadas el 2026-10-25:
 
 La referencia OWASP corresponde a almacenamiento de contraseñas; se utiliza aquí
 como piso de coste de diseño para PBKDF2, no como certificación de esta bóveda.
+
+## 8. Persistencia implementada en T-003
+
+El repositorio acepta exclusivamente `EncryptedData`. El códec mantiene modelo,
+maestra y clave en memoria y no imprime ni registra sus valores. `repr` de Credential
+no revela sus campos; Vault oculta la colección. Los tests usan únicamente datos
+ficticios y directorios temporales, con inspección del temporal antes de publicarlo.
+
+La escritura serializa solo el sobre cifrado, crea un temporal exclusivo mediante
+`mkstemp` en el mismo directorio, comprueba escritura completa, hace flush y fsync,
+cierra y publica. Al guardar se usa `os.replace`; al crear se usa `os.link` para
+publicar el archivo completo sin sobrescribir un destino existente. Se requieren
+enlaces duros (verificado sobre NTFS); en un sistema incompatible se falla sin
+publicar un archivo parcial. El temporal se elimina best effort en éxito o fallo.
+Un cierre abrupto o fallo de limpieza puede dejar un temporal, siempre cifrado.
+
+mkstemp crea archivos con permisos restrictivos POSIX; en Windows se heredan ACL
+del directorio. No se modifican permisos del sistema ni se garantiza aislamiento
+frente a otros usuarios con acceso al directorio. La ruta final debe estar en un
+directorio local de confianza. Lectura rechaza rutas no regulares y symlinks
+detectables por lstat; no se promete resistencia a carreras de un proceso malicioso.
+
+El guardado comprueba el sobre actual frente a `expected`. El llamador debe haber
+autenticado ese snapshot; el repositorio no puede verificar tags sin recibir claves.
+Un cambio detectado provoca conflicto; un archivo corrupto o inexistente provoca
+error sin reparación ni creación implícita. Esta comprobación no es un CAS atómico:
+no protege frente a otro proceso que escriba entre la lectura y el reemplazo.
+El alcance sigue siendo un único proceso con acceso secuencial.
+
+Errores de disco/permisos usan mensajes fijos sin rutas o datos originales y sin
+cadena de excepción visible. `open_vault` unifica fallos de maestra, autenticación
+y contenido descifrado inválido. Formato incompatible y archivo inexistente se
+distinguen como categorías de infraestructura para el futuro servicio de T-004.
+
+El fsync del archivo no implica garantía absoluta de durabilidad del directorio
+ante corte eléctrico: no se sincroniza la entrada del directorio. Tampoco hay
+protección frente a rollback de una copia cifrada antigua, malware, swap o volcados
+de memoria. No se introducen copias de seguridad ni recuperación maestra.
+
+Referencias de operaciones de archivo:
+[os.replace / os.link](https://docs.python.org/3/library/os.html#os.replace) y
+[tempfile.mkstemp](https://docs.python.org/3/library/tempfile.html#tempfile.mkstemp).
