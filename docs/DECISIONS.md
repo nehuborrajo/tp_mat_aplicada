@@ -58,3 +58,25 @@ No bloquean el bootstrap; deben resolverse antes de sus tickets respectivos:
   lo establecen como obligatorio. Queda abierta la profundidad docente específica.
 - Las fuentes originales PDF/DOCX no están presentes; la trazabilidad académica actual
   depende de la transcripción en estos documentos, sin auditoría literal del original.
+
+## Ejecución de T-002 — 2026-10-25
+
+- Autorizado T-002 por el usuario; T-001 (`fdbca4e`) subido a origin/main.
+- Se adopta D-002 para este ticket: `cryptography==49.0.0`, PBKDF2-HMAC-SHA256,
+  clave de 32 bytes y AES-256-GCM. No se implementan algoritmos propios.
+- Coste inicial 2.400.000 iteraciones, elegido tras medición local para objetivo de
+  250–500 ms. Mínimo 600.000 basado en OWASP; máximo 5.000.000 para acotar trabajo
+  previo a autenticar (mediana local inferior a un segundo). Son decisiones de diseño,
+  no requisitos docentes ni garantías de tiempo en otros equipos.
+- Sal CSPRNG nueva de 16 bytes por bóveda; se aceptan 16–64 bytes. Contraseña en
+  bytes UTF-8, de 1 a 1024 bytes; nunca recortar ni normalizar silenciosamente.
+- Nonce CSPRNG de 12 bytes nuevo por llamada a encrypt, sin parámetro público para
+  reutilizarlo. La primitiva es sin estado y no mantiene historial global de nonces.
+- AAD canónico v1 fijado en DATA_MODEL; se autentican también sal, coste y nonce.
+- Mensaje único de descifrado ante estructura inválida o autenticación fallida.
+  Los errores de configuración/entrada de derivación no contienen valores secretos;
+  el servicio futuro deberá traducir todos los fallos de apertura al mensaje genérico.
+- Rechazo de alteraciones implementado en T-002 pese a la etiqueta P1 de FR-013:
+  es necesario para FR-002 y para el cifrado autenticado obligatorio.
+- La calibración debe repetirse en el equipo de defensa. No hay reducción automática
+  del coste ni migración de bóvedas. Persistencia y parseo seguro pertenecen a T-003.

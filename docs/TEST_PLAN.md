@@ -81,3 +81,78 @@ No introducir credenciales reales: T-001 no dispone de formularios ni almacenami
 La comprobación visual manual sigue pendiente de ejecución y confirmación del usuario;
 las pruebas gráficas automáticas no la sustituyen. El commit de T-001 conserva esta
 limitación documentada y no implica autorización para iniciar T-002 ni publicar en remoto.
+
+## Evidencia T-002 — 2026-10-25
+
+Usuario autorizó avanzar a T-002; el commit de T-001 `fdbca4e` fue subido a origin/main.
+Entorno: Windows 11 (10.0.26200), Python 3.14.7, Intel64 Family 6 Model 181
+Stepping 0, cryptography 49.0.0. Instalación editable actualizada correctamente.
+
+Medición reproducible: `python -m vaultlab.crypto.benchmark`, tres muestras por
+candidato, contraseña y sal ficticias fijas. Solo se imprimen entorno y medianas:
+
+| Iteraciones | Mediana local |
+|---|---|
+| 600.000 | 94,64 ms |
+| 1.200.000 | 178,48 ms |
+| 2.400.000 | 375,25 ms |
+| 5.000.000 | 783,36 ms |
+
+Objetivo de diseño 250–500 ms; se eligen 2.400.000 iteraciones iniciales.
+Estas cifras no garantizan rendimiento en el equipo de defensa, donde se debe repetir.
+
+Cobertura: derivación determinista de 32 bytes contrastada con `hashlib.pbkdf2_hmac`,
+cambio de sal/maestra/coste, límites y tipos estrictos; fuente CSPRNG para sal/nonce;
+AES-256-GCM con contenido vacío, bytes y UTF-8; canonicalización de todos los campos
+AAD; rechazo de cambios en ciphertext, tag, clave, nonce, sal, coste y cabecera;
+datos truncados, tipos inválidos, límites de tamaño y errores genéricos; flujo completo
+maestra → derivación → cifrado → derivación → descifrado, sin persistencia.
+No se usan secretos reales ni se imprimen resultados derivados.
+
+El test de nonces comprueba dos llamadas a la fuente segura con resultados distintos
+controlados; no pretende demostrar estadísticamente ausencia de colisiones.
+Las pruebas usan el mínimo admitido para reducir duración, sin modificar la política real.
+
+Verificación final: `ruff check .` pasa; `pytest` con `VAULTLAB_TEST_GUI=1`
+aprueba 52 pruebas (incluida construcción/renderizado/cierre de la ventana real),
+sin omisiones ni advertencias; `pip check` correcto y `git diff --check` sin errores
+de espacios. En esa verificación previa, origin/main estaba en `fdbca4e` y
+los cambios de T-002 todavía no estaban confirmados.
+
+La revisión visual manual de la ventana base continúa pendiente; T-002 no modifica
+la UI ni implementa el Laboratorio Criptográfico. No se verifica una bóveda en disco,
+porque la persistencia comienza en T-003. Uso exclusivamente académico.
+
+## Revisión técnica de cierre de T-002 — 2026-10-25
+
+Revisión solicitada y commit/push autorizados por el usuario, limitada a T-002.
+No se encontraron problemas funcionales en las primitivas revisadas; no se cambió
+su implementación ni se inició almacenamiento persistente.
+
+| Punto | Evidencia revisada y resultado |
+|---|---|
+| PBKDF2 | SHA-256, clave de 32 bytes, sal nueva de 16 bytes vía `secrets.token_bytes`; validación previa de tipo, tamaño y coste. Inicial 2.400.000, intervalo 600.000–5.000.000. Correcto. |
+| AES-GCM | Clave exclusivamente de 256 bits; solicitud de nonce CSPRNG de 12 bytes por cifrado, sin entrada pública de nonce; tag completo. Pruebas rechazan modificaciones de ciphertext, tag, nonce, sal, iteraciones y cabecera AAD. Correcto. |
+| Secretos | Inspección de código sin logging ni impresión en las primitivas; prueba adicional verifica stdout/stderr y registros vacíos en éxito y fallo, mensajes genéricos y traceback normal sin valores secretos. El benchmark solo imprime entorno y tiempos de datos ficticios. Correcto. |
+| Desacoplamiento | Imports inspeccionados; prueba en intérprete nuevo confirma que cargar el motor no carga Tk, UI, servicios ni storage. No hay acceso a archivos en el motor. Correcto. |
+| Calibración | Tabla y entorno originales documentados arriba; script reproducible con tres muestras por candidato y mediana. 2.400.000 → 375,25 ms en ese equipo. Correcto. |
+| Casos adversos | Pruebas de ida y vuelta, referencia PBKDF2, contraseña equivocada, tipos/límites, datos truncados, parámetros manipulados y autenticación fallida. Correcto. |
+
+El benchmark usa `perf_counter`: mide construcción de PBKDF2HMAC y derivación de
+32 bytes con sal/maestra ficticias fijas. Los candidatos se ejecutan secuencialmente,
+sin calentamiento explícito ni aislamiento de carga del sistema. No mide GUI, I/O,
+cifrado ni un desbloqueo completo. La cifra original no se presenta como una nueva
+medición de esta revisión. Repetir en el equipo de exposición.
+
+Resultados finales después de las dos pruebas adicionales:
+
+- `ruff check .`: correcto.
+- `pytest` con `VAULTLAB_TEST_GUI=1`: **54 aprobadas**, sin omisiones ni advertencias.
+- `pip check`: sin dependencias incompatibles.
+
+Se mantienen los límites conocidos: nonce aleatorio sin garantía absoluta de unicidad,
+sin borrado garantizado de memoria en Python, sin persistencia ni integración visual
+criptográfica. Revisión visual manual de T-001 aún pendiente. FR-011 / Laboratorio
+Criptográfico sigue obligatorio **P0**: deberá explicar visiblemente las operaciones
+matemáticas internas con ejemplos ficticios; T-002 no lo sustituye ni lo da por cumplido.
+T-003 no está autorizado. Solo uso académico, sin credenciales reales.

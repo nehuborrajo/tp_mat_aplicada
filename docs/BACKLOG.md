@@ -22,4 +22,8 @@
 - T-001 (2026-10-25): implementados bootstrap, ventana base y pruebas. Ruff y tres
   tests con GUI pasan; arranque gráfico detectado. Revisión visual manual pendiente
   por fallo de la herramienta de escritorio; detalles en `TEST_PLAN.md`.
-- T-002 y siguientes: no iniciados; requieren nueva autorización explícita.
+- T-002 (2026-10-25): implementadas primitivas, política de parámetros, AAD y
+  pruebas adversas; revisión técnica final satisfactoria, 54 pruebas aprobadas,
+  Ruff y pip check correctos. Commit/push autorizados. Calibración y evidencia en
+  TEST_PLAN.md. Sin persistencia ni UI criptográfica. Laboratorio obligatorio P0 pendiente.
+- T-003 y siguientes: no iniciados; requieren nueva autorización explícita.

@@ -1,1 +1,1 @@
-"""Capa criptográfica reservada para T-002; sin algoritmos implementados."""
+"""PBKDF2 y AES-GCM mediante cryptography; sin UI ni persistencia."""

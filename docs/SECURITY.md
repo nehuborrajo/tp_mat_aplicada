@@ -28,3 +28,37 @@ Clave errónea, ciphertext cambiado, tag alterado, nonce/sal/cabecera inválidos
 
 ## 6. Mensaje ético y límites
 Se trata de un proyecto educativo; no recomendar su uso con contraseñas de producción antes de auditoría externa, hardening, pruebas de plataforma y mantenimiento. Demo siempre con credenciales ficticias.
+
+## 7. Política implementada en T-002 (decisión de diseño)
+
+PBKDF2-HMAC-SHA256 deriva 32 bytes mediante `PBKDF2HMAC`, sin verificador separado.
+Se aceptan enteros estrictos entre 600.000 y 5.000.000 iteraciones, rechazando también
+booleanos. Valor inicial medido: 2.400.000. La sal admite 16–64 bytes; al crear se
+generan 16 bytes con `secrets.token_bytes`. La maestra llega como bytes (1–1024),
+sin normalización: la conversión UTF-8 corresponde al futuro servicio/UI.
+
+AESGCM admite exclusivamente claves de 32 bytes; cada cifrado genera un nonce de
+12 bytes mediante `secrets`. Tag completo de 16 bytes concatenado al ciphertext.
+Contenido máximo: 16 MiB; nunca se devuelve plaintext si falla la autenticación.
+Errores de descifrado: «No se pudo desbloquear la bóveda.», sin causa detallada
+en la salida normal. No se registran claves, maestras ni contenido.
+
+Los límites acotan trabajo y memoria de la primitiva; no reemplazan los límites de
+archivo/base64/JSON que T-003 debe aplicar ANTES de decodificar o derivar.
+La API interna separa derivación y cifrado: el llamador debe usar la clave derivada
+con los mismos parámetros que entrega a encrypt; no pasar una clave de otra bóveda.
+Las claves retornadas quedan en memoria del llamador; Python no garantiza su borrado.
+
+Los nonces aleatorios no ofrecen unicidad absoluta. Como referencia de diseño para
+esta demo, con un millón de cifrados por clave la aproximación de cumpleaños es
+`n(n-1)/2^97 ≈ 6,3×10^-18`. No escalar este diseño sin revisar gestión de nonces
+y rotación. El contador global no forma parte de la primitiva sin estado de T-002.
+
+Fuentes consultadas el 2026-10-25:
+
+- [cryptography: AESGCM](https://cryptography.io/en/49.0.0/hazmat/primitives/aead/#cryptography.hazmat.primitives.ciphers.aead.AESGCM)
+- [cryptography: derivación de claves](https://cryptography.io/en/latest/hazmat/primitives/key-derivation-functions/)
+- [OWASP: coste PBKDF2](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#pbkdf2)
+
+La referencia OWASP corresponde a almacenamiento de contraseñas; se utiliza aquí
+como piso de coste de diseño para PBKDF2, no como certificación de esta bóveda.

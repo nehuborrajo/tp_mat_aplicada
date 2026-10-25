@@ -33,3 +33,24 @@ Ejemplo **ilustrativo, no vector criptográfico válido**:
 
 ## 4. Migraciones
 No implementar migraciones en v1; rechazar versiones desconocidas con mensaje claro. Para cambios futuros, especificar migración transaccional, copia cifrada y pruebas de compatibilidad.
+
+## 5. Contrato criptográfico fijado por T-002
+
+En memoria, `EncryptedData` contiene `parameters` (sal e iteraciones), `nonce` y
+`ciphertext` (incluye tag de 16 bytes). No contiene clave ni maestra. No se ha
+implementado lectura/escritura del sobre: eso corresponde a T-003.
+
+AAD = JSON de la cabecera sin `ciphertext_b64`, con exactamente los campos mostrados
+en el sobre: `format="vaultlab"`, `version=1`, nombres de algoritmo fijos,
+`salt_b64`, `iterations` y `nonce_b64`. Serialización mediante `json.dumps` con
+`sort_keys=True`, `separators=(",", ":")`, `ensure_ascii=True`, codificada ASCII,
+sin espacios ni salto final. Base64 estándar con padding.
+
+T-003 deberá rechazar campos extra, versiones/algoritmos desconocidos y tipos
+ambiguos; decodificar base64 estrictamente y reconstruir AAD mediante `build_aad`.
+No descartar campos de cabecera importados silenciosamente. Cambiar cualquier
+parámetro autenticado debe invalidar el tag o provocar rechazo previo de formato.
+
+La cifra `iterations: 0` del ejemplo continúa siendo inválida. Coste inicial
+2.400.000; intervalo aceptado 600.000–5.000.000. Sal 16–64 bytes, nonce 12 bytes,
+clave 32 bytes y contenido cifrado entre 16 y 16 MiB + 16 bytes.
