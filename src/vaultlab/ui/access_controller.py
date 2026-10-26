@@ -2,10 +2,11 @@
 
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from queue import Empty, Queue
 
+from vaultlab.domain.models import Credential
 from vaultlab.services.vault_service import (
     VaultAuthenticationError,
     VaultInputError,
@@ -42,6 +43,15 @@ class AccessResult:
     unlocked: bool
     message: str
     error: bool = False
+
+
+@dataclass(frozen=True)
+class VaultResult(AccessResult):
+    """Respuesta explícita de bóveda; campos sensibles excluidos de repr."""
+
+    rows: tuple[tuple[str, str, str], ...] = field(default=(), repr=False)
+    credential: Credential | None = field(default=None, repr=False)
+    action: str = "list"
 
 
 class AccessController:
@@ -85,6 +95,62 @@ class AccessController:
         self.busy = True
         self._generation += 1
         self._executor.submit(self._lock, self._generation)
+
+    def operate(self, action: str, **arguments) -> bool:
+        """Operaciones de bóveda serializadas con acceso/bloqueo; nunca expone Future."""
+        if action not in {"list", "detail", "copy", "add", "update", "delete"}:
+            return False
+        if self.busy or not self.unlocked or self.closing or self.closed:
+            return False
+        self.busy = True
+        self._generation += 1
+        self._executor.submit(self._operate, self._generation, action, arguments)
+        return True
+
+    def _operate(self, generation: int, action: str, arguments: dict) -> None:
+        try:
+            service = self._service
+            if service is None or service.state is not VaultState.UNLOCKED:
+                raise VaultStateError
+            credential = None
+            if action in {"detail", "copy"}:
+                credential = service.get_credential(arguments["identifier"])
+            elif action in {"add", "update", "delete"}:
+                getattr(service, action)(**arguments)
+            rows = tuple((c.id, c.name, c.username) for c in service.list_credentials())
+            result = VaultResult(
+                generation,
+                True,
+                "Bóveda actualizada."
+                if action in {"add", "update", "delete"}
+                else "Sesión autenticada.",
+                rows=rows,
+                credential=credential,
+                action=action,
+            )
+        except VaultInputError:
+            result = VaultResult(
+                generation,
+                True,
+                "Revise los campos y sus límites; nombre y contraseña son obligatorios.",
+                True,
+                action=action,
+            )
+        except Exception:
+            if self._service is not None:
+                self._service.lock()
+            result = VaultResult(
+                generation,
+                False,
+                "No se pudo completar la operación; "
+                "vuelva a desbloquear. El archivo no se sobrescribe "
+                "ante conflictos.",
+                True,
+                action=action,
+            )
+        finally:
+            arguments.clear()
+        self._results.put(result)
 
     def poll(self) -> AccessResult | None:
         """Consume resultados válidos desde el hilo UI; descarta éxitos obsoletos."""
@@ -131,8 +197,10 @@ class AccessController:
             result = AccessResult(generation, False, "No se pudo desbloquear la bóveda.", True)
         except VaultUpdateConflictError:
             result = AccessResult(
-                generation, False,
-                "El archivo ya existe; use Desbloquear o elija otro destino.", True,
+                generation,
+                False,
+                "El archivo ya existe; use Desbloquear o elija otro destino.",
+                True,
             )
         except VaultInputError:
             result = AccessResult(

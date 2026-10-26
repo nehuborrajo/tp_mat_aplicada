@@ -1,0 +1,9 @@
+{
+  "python": "3.13.5",
+  "pyinstaller": "6.22.3",
+  "platform": "Windows x64",
+  "mode": "onefile/windowed",
+  "bytes": 22516489,
+  "sha256": "77d8672369a319cdcf9dbcb00c4bc57f2fe47da7fc3da3c4700fc7d09ffc6929",
+  "customtkinter_data": "--collect-data customtkinter"
+}

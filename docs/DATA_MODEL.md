@@ -1,5 +1,11 @@
 # Modelo de datos y formato persistente — propuesta
 
+Estado T-006–T-012: formato v1 sin cambios. CRUD crea UUID y fechas UTC en el
+servicio; una edición conserva id/created_at y actualiza updated_at sin retroceder.
+Solo campos de contenido son editables. El guardado persiste un candidato validado
+antes de cambiar la sesión. La GUI recibe metadatos de tabla y solicita detalle
+explícitamente; nunca obtiene la clave de sesión ni el paquete cifrado para escribir.
+
 ## 1. Registro lógico dentro de la bóveda (solo cifrado)
 ```json
 {

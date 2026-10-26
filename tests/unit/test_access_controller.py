@@ -53,10 +53,17 @@ def consume(controller: AccessController) -> AccessResult:
     raise AssertionError("El worker no produjo resultado")
 
 
-@pytest.mark.parametrize(("text", "confirmation"), [
-    ("", None), ("P" * 1025, None), ("ñ" * 513, None),
-    ("\ud800", None), ("DEMO", "OTRA-DEMO"), ("DEMO ", "DEMO"),
-])
+@pytest.mark.parametrize(
+    ("text", "confirmation"),
+    [
+        ("", None),
+        ("P" * 1025, None),
+        ("ñ" * 513, None),
+        ("\ud800", None),
+        ("DEMO", "OTRA-DEMO"),
+        ("DEMO ", "DEMO"),
+    ],
+)
 def test_master_validation_never_echoes_input(text: str, confirmation: str | None) -> None:
     with pytest.raises(ValueError) as error:
         encode_master(text, confirmation)
@@ -117,13 +124,21 @@ def test_close_invalidates_pending_success(tmp_path: Path) -> None:
         controller.dispose()
 
 
-@pytest.mark.parametrize("failure", [
-    VaultAuthenticationError("SECRETO-FICTICIO"), VaultUpdateConflictError("SECRETO-FICTICIO"),
-    VaultInputError("SECRETO-FICTICIO"), VaultPersistenceError("SECRETO-FICTICIO"),
-    VaultStateError("SECRETO-FICTICIO"), RuntimeError("SECRETO-FICTICIO"),
-])
+@pytest.mark.parametrize(
+    "failure",
+    [
+        VaultAuthenticationError("SECRETO-FICTICIO"),
+        VaultUpdateConflictError("SECRETO-FICTICIO"),
+        VaultInputError("SECRETO-FICTICIO"),
+        VaultPersistenceError("SECRETO-FICTICIO"),
+        VaultStateError("SECRETO-FICTICIO"),
+        RuntimeError("SECRETO-FICTICIO"),
+    ],
+)
 def test_errors_return_only_sanitized_results(
-    tmp_path: Path, failure: Exception, capsys: pytest.CaptureFixture[str],
+    tmp_path: Path,
+    failure: Exception,
+    capsys: pytest.CaptureFixture[str],
 ) -> None:
     service = ControlledService()
     service.failure = failure
@@ -168,4 +183,46 @@ def test_missing_session_never_reports_success(tmp_path: Path) -> None:
         assert not controller.unlocked
         assert "sesión no está disponible" in result.message
     finally:
+        controller.dispose()
+
+
+def test_lock_discards_late_sensitive_result(tmp_path: Path):
+    from vaultlab.domain.models import Credential
+
+    class DelayedCredentialService(ControlledService):
+        def get_credential(self, identifier):
+            self.started.set()
+            assert self.release.wait(5)
+            return Credential(
+                identifier,
+                "FICTICIO",
+                "demo@example.test",
+                "SECRETO-FICTICIO",
+                "",
+                "",
+                "2026-10-25T00:00:00Z",
+                "2026-10-25T00:00:00Z",
+            )
+
+        def list_credentials(self):
+            return ()
+
+    service = DelayedCredentialService()
+    controller = AccessController(lambda path: service)
+    try:
+        controller.submit(create=False, path=tmp_path / "demo.vault", password=b"FICTICIA")
+        consume(controller)
+        service.started.clear()
+        service.release.clear()
+        assert controller.operate("copy", identifier="00000000-0000-0000-0000-000000000001")
+        assert service.started.wait(2)
+        assert not controller.operate("delete", identifier="inexistente")
+        controller.request_lock()
+        service.release.set()
+        result = consume(controller)
+        assert not result.unlocked
+        assert type(result) is AccessResult
+        assert "SECRETO" not in repr(result)
+    finally:
+        service.release.set()
         controller.dispose()

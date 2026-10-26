@@ -17,7 +17,8 @@ from vaultlab.ui.main_window import MainWindow, create_window
 pytestmark = [
     pytest.mark.gui,
     pytest.mark.skipif(
-        os.environ.get("VAULTLAB_TEST_GUI") != "1", reason="Requiere GUI habilitada.",
+        os.environ.get("VAULTLAB_TEST_GUI") != "1",
+        reason="Requiere GUI habilitada.",
     ),
 ]
 MASTER = "MAESTRA-GUI-FICTICIA-NO-REAL"
@@ -95,9 +96,61 @@ def test_validation_and_mode_changes_clear_secrets(window: MainWindow, tmp_path:
     assert not view.confirmation.winfo_ismapped()
 
 
+def test_lock_controls_only_exist_when_useful(window, tmp_path):
+    view = window.access_view
+    assert not view.lock_button.winfo_viewable()
+    assert not window.sidebar_lock.winfo_viewable()
+    view.mode.set(UNLOCK)
+    view._mode_changed(UNLOCK)
+    window.update()
+    assert not view.lock_button.winfo_viewable()
+    window.lock_and_return()
+    assert not view.controller.busy
+    view.mode.set(CREATE)
+    view._mode_changed(CREATE)
+    view.password.insert(0, MASTER)
+    view.confirmation.insert(0, MASTER)
+    view.submit()
+    window.update()
+    assert view.lock_button.winfo_viewable()
+    pump(window, lambda: not view.controller.busy)
+    assert window.sidebar_lock.winfo_viewable()
+    view.lock_button.invoke()
+    pump(window, lambda: not view.controller.busy)
+    window.update()
+    assert not view.lock_button.winfo_viewable()
+    assert not window.sidebar_lock.winfo_viewable()
+
+
+def test_access_user_errors_show_at_top_without_starting_worker(window):
+    from vaultlab.ui.theme import RED
+
+    view = window.access_view
+    view.path.delete(0, "end")
+    view.submit()
+    window.update()
+    assert "archivo de bóveda válido" in view.validation_notice.cget("text")
+    assert view.path.cget("border_color") == RED
+    view.path.insert(0, "archivo-ficticio.vault")
+    view.submit()
+    assert "Ingresá la contraseña maestra" in view.validation_notice.cget("text")
+    view.password.insert(0, MASTER)
+    view.submit()
+    assert "Confirmá" in view.validation_notice.cget("text")
+    assert view.password.get() == ""
+    assert not view.controller.busy
+    view.mode.set(UNLOCK)
+    view._mode_changed(UNLOCK)
+    window.update()
+    assert not view.validation_notice.winfo_viewable()
+
+
 @pytest.mark.parametrize("kind", ["missing", "corrupt", "incompatible", "existing", "write"])
 def test_file_errors_leave_gui_locked(
-    window: MainWindow, tmp_path: Path, kind: str, monkeypatch: pytest.MonkeyPatch,
+    window: MainWindow,
+    tmp_path: Path,
+    kind: str,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     view = window.access_view
     path = tmp_path / "demo.vault"
@@ -126,7 +179,8 @@ def test_file_errors_leave_gui_locked(
 
 @pytest.mark.parametrize("close", [False, True])
 def test_tk_responds_during_worker_and_invalidates_late_success(
-    tmp_path: Path, close: bool,
+    tmp_path: Path,
+    close: bool,
 ) -> None:
     started, release = Event(), Event()
     calls = []

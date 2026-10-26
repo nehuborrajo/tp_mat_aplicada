@@ -1,5 +1,29 @@
 # Seguridad y modelo de amenazas (propuesta de ingeniería)
 
+## Estado vigente de integración T-006–T-012
+
+CRUD usa el paquete autenticado de la sesión como expected; la GUI no provee claves,
+paquetes ni snapshots externos. Se conserva AES-GCM y el parseo estricto de v1.
+Tabla sin contraseñas; edición enmascarada y revelado temporal de 10 segundos.
+Los secretos de los formularios se limpian al cerrar/bloquear; no se añaden logs.
+
+Solo la petición explícita de detalle/copiar transporta una credencial al hilo UI;
+el resultado omite esos campos en repr y se libera tras consumirlo. La cola se
+depura por generación al bloquear; un copiado tardío no reabre ni repuebla la vista.
+Python/Tk y trazas internas no permiten garantizar eliminación física de memoria.
+
+Portapapeles con plazo seleccionable 20/25/30/60 s, limpieza condicional al vencer
+y al bloquear/cerrar. Fallos del SO no exponen valores. La comparación seguida de
+limpieza no es atómica frente a otra app; historial del SO y gestores pueden retener datos.
+
+Generador uniforme con secrets.choice sobre alfabeto sin duplicados, sin cuotas
+por categoría. Indicador de fortaleza heurístico, sin consultas externas ni promesas
+de resistencia. Laboratorio aislado, entradas ficticias internas, claves nunca visibles.
+
+Siguen los límites de un proceso, ACL heredadas, ausencia de antirrollback y
+durabilidad absoluta. Autolock y backup manual no implementados. Kit offline sin
+bóvedas, claves, .env ni directorios del usuario. Informes anteriores son históricos.
+
 ## 1. Alcance de protección
 Se protege la **confidencialidad e integridad del archivo de bóveda en reposo** frente a alguien que obtiene una copia del archivo pero no conoce la contraseña maestra. No se promete defensa frente a malware, keyloggers, procesos con acceso a memoria, portapapeles o escritorio desbloqueado, administradores del sistema ni contraseña maestra débil.
 

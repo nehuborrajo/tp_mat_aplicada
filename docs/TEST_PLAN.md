@@ -1,5 +1,59 @@
 # Plan de pruebas y aceptación
 
+## Ejecutable autónomo Windows
+
+299 pruebas aprobadas, sin omisiones ni advertencias, en 101,43 s; JUnit en
+`evidence/pytest-exe.xml`. Se repitió la suite con copia local de Tcl/Tk tras un
+fallo de inicialización externo al caso. Cuatro casos nuevos verifican la ruta
+persistente solo para frozen y el fallback al perfil del usuario.
+El binario real pasó su diagnóstico, arranque normal y cierre nativo desde una
+carpeta aislada con Python/entorno virtual fuera del PATH y sin sus variables.
+Evidencia: `evidence/exe-build.json`, `evidence/exe-smoke.json` y EXE_GUIDE.md.
+
+## Validación de formularios y bloqueo contextual
+
+295 aprobadas con GUI habilitada, sin omisiones ni advertencias, en 102,19 s.
+Evidencia: `evidence/pytest-validation.xml`. Siete casos unitarios y cuatro gráficos
+nuevos verifican obligatorios, límites, UTF-8, ausencia de secretos en mensajes,
+corrección sin perder datos ni escribir disco, errores del generador, avisos de
+acceso y bloqueo visible solo cuando corresponde. Dos flujos de acceso/bloqueo
+se repitieron tras el ajuste final de texto. Captura real en
+`evidence/10-validacion-credencial.png`. Se repitió la corrida tras un error de
+inicialización de Tcl previo al caso; resultado definitivo satisfactorio.
+
+## Rediseño posterior de interfaz y didáctica
+
+284 pruebas aprobadas con GUI habilitada, sin omisiones ni advertencias, en 91,24 s.
+Evidencia: `evidence/pytest-redesign.xml`; regresión GUI posterior en
+`evidence/pytest-gui-redesign.xml`. Nueve casos nuevos respecto del cierre previo.
+Se verifican cuatro pasos, preguntas/reintento, entropía interactiva, navegación
+durante el cálculo, dos fixtures, rechazo de entradas no admitidas, edición descartada
+al navegar, bloqueo lateral y error sanitizado con reintento. Capturas reales y
+comprobación de tamaño mínimo 960×700. Detalle vigente: INTERFACE_REPORT.md.
+
+## Resultado vigente T-006–T-012
+
+Suite ampliada: **275 aprobadas**, GUI habilitada, sin omisiones ni advertencias
+en la ejecución final con permisos del usuario y rutas Tk explícitas. Ruff y pip
+check correctos. Evidencia JUnit en `evidence/pytest.xml`, versiones exactas en
+`evidence/environment-lock.txt` y alcance/limitaciones en `FINAL_REPORT.md`.
+La caché de pytest se deshabilitó por ACL; hubo una corrida intermedia con un error
+de instalación Tk, documentado en el informe, seguido de repetición satisfactoria.
+
+Se agregan 87 casos: persistencia CRUD, fallos de cada mutación, conflictos,
+validaciones, autenticación obligatoria, políticas del generador, fortaleza,
+portapapeles, laboratorio, flujos gráficos y descarte de copiado tardío al bloquear.
+También se generó e instaló el kit offline usando solo wheels locales y se probó
+persistencia/laboratorio/GUI desde el paquete instalado en un entorno separado.
+No se atribuye un porcentaje de cobertura ni una auditoría externa a estos tests.
+
+Las capturas reales fueron inspeccionadas visualmente. La revisión humana completa
+de usabilidad en el equipo de defensa queda pendiente; guía en `DEMO_GUIDE.md`.
+Los resultados de T-001–T-005 de abajo son evidencia histórica de otras versiones.
+Tras el ajuste final del temporizador de revelado se repitieron los 15 casos GUI:
+15 aprobados, 260 no seleccionados, sin advertencias, en 24,50 s. Evidencia en
+`evidence/pytest-gui-final.xml`; wheel final reconstruido y smoke repetido con éxito.
+
 ## Automatizadas
 - UT-01 PBKDF2: mismo password+salt+parámetros = misma clave; sal distinta => clave distinta; clave 32 bytes.
 - UT-02 AES-GCM: ida-vuelta plaintext/ciphertext; nonce fresco por guardado; fallar ante alteración de ciphertext, tag, AAD o nonce.

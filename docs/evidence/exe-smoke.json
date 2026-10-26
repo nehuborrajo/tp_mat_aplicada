@@ -1,0 +1,19 @@
+{
+  "frozen": true,
+  "bundled_themes_fonts": true,
+  "persistent_user_data_path": true,
+  "gui_render": true,
+  "required_field_feedback": true,
+  "create_save_lock_reopen": true,
+  "laboratory_four_steps_entropy_integrity": true,
+  "tk_callback_errors": false,
+  "coordinated_close": true,
+  "ok": true,
+  "exit_code": 0,
+  "isolated_cwd": true,
+  "python_environment_removed": true,
+  "python_not_on_path": true,
+  "normal_double_click_start": true,
+  "native_window_close": true,
+  "default_data_directory_created": true
+}

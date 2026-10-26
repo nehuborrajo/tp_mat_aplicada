@@ -1,5 +1,35 @@
 # Arquitectura técnica
 
+Rediseño posterior: MainWindow separa Mi bóveda y Aprender criptografía en páginas
+desplazables con navegación persistente. LaboratoryView renderiza LabReport.steps,
+diagramas Canvas y un explorador de entropía con GeneratorPolicy; sus preguntas y
+progreso son locales. Cambiar sección limpia entradas/ediciones sin tocar la sesión.
+Los cálculos siguen en su worker aislado. Destroy cancela polling explícitamente.
+Detalle y evidencia actual: INTERFACE_REPORT.md.
+
+## Implementación vigente T-006–T-012
+
+`VaultService` agrega list_credentials/get_credential/add/update/delete. Cada
+mutación crea un candidato validado; `_persist` cifra, guarda con expected y solo
+entonces instala el snapshot. Los fallos de almacenamiento descartan la sesión.
+
+`AccessController.operate` comparte el mismo executor de acceso y bloqueo. Los
+resultados `VaultResult` llevan filas (id/nombre/usuario), y Credential solo para
+detalle/copiar solicitado; repr excluye esos campos. Los resultados de acceso
+conservan su contrato anterior sin secretos. Tk consume la cola y descarta generaciones
+anteriores; el worker no toca widgets. Los argumentos de edición se liberan al terminar.
+
+`VaultView` renderiza metadatos y `CredentialDialog` mantiene campos solo mientras
+se edita. Revelado de 10 s; cierre/bloqueo limpia tabla, diálogo y portapapeles.
+`ClipboardManager` compara antes de limpiar y cancela el temporizador previo al recopiar.
+`password_generator` y `strength` son servicios puros, sin GUI o red.
+
+`LaboratoryView` ejecuta `run_experiment` en un worker independiente sin acceso a
+la bóveda, con consulta del Future desde Tk y errores sanitizados. Muestra fórmulas,
+parámetros públicos y resultados de referencia/autenticación; nunca claves o maestra.
+
+Los apartados de infraestructura T-001–T-005 de abajo reflejan su alcance histórico.
+
 ## 1. Estilo
 Aplicación de escritorio de proceso único, modular, offline. UI depende de servicios; servicios dependen de interfaces de criptografía/almacenamiento, nunca a la inversa. Separación para permitir tests sin GUI.
 

@@ -1,102 +1,103 @@
-# VaultLab — Administrador de Contraseñas Seguro
+﻿# VaultLab — Administrador de credenciales y laboratorio matemático
 
-**Estado:** T-001 a T-005 cerrados tras revisión: creación y desbloqueo desde la GUI, con operaciones en segundo plano. CRUD todavía no implementado. Revisiones manuales de T-001 y T-005 confirmadas por el usuario. **Materia:** Matemática Aplicada — segundo parcial. **Idioma de producto y documentación:** español. **Objetivo:** aplicación local de escritorio para administrar credenciales en una bóveda cifrada, explicar su fundamento matemático y defenderla en vivo.
+Aplicación académica local de escritorio, mono-usuario y offline. T-001 a T-011
+implementados y verificados; T-012 entrega borradores editables de paper y defensa.
+Usar únicamente datos ficticios. No es un producto auditado para contraseñas reales.
 
-## Ejecutar VaultLab (Windows / PowerShell)
+## Ejecutar en Windows
 
-Requiere Python 3.12 o superior con Tk y una sesión gráfica de escritorio.
-Python + CustomTkinter son decisiones de diseño, no requisitos docentes.
+**Ejecutable autónomo:** abrir `dist/VaultLab.exe` con doble clic. Incluye Python y
+dependencias; no necesita instalación ni internet. La bóveda inicial queda en
+`%LOCALAPPDATA%\VaultLab\vault.vault` y se puede elegir otra ruta. Para abrir una
+bóveda ya creada desde el código fuente, seleccionarla en Desbloquear.
+Guía y pruebas: [EXE_GUIDE.md](docs/EXE_GUIDE.md).
+
+Para ejecutar desde código fuente:
+
+Python >=3.12 con Tk y sesión gráfica. Entorno verificado: CPython 3.13.5 / Windows x64.
 
 ```powershell
-py -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -e ".[dev]"
-.\.venv\Scripts\python.exe -m vaultlab
+py -3.13 -m venv .venv
+.venv/Scripts/python.exe -m pip install -e ".[dev]"
+.venv/Scripts/python.exe -m vaultlab
 ```
 
-La instalación inicial descarga dependencias; la aplicación funciona offline.
-Para preparar una demo sin red, instalar y verificar previamente en el equipo de exposición.
-No se requiere activar el entorno ni modificar la política de ejecución de PowerShell.
+No requiere activar el entorno ni cambiar la política de ejecución. La instalación
+inicial usa red; la app no accede a red ni tiene cuentas remotas o telemetría.
+
+## Funciones
+
+- Crear/desbloquear/bloquear una bóveda cifrada con PBKDF2-HMAC-SHA256 y AES-256-GCM.
+- Altas, edición y bajas con confirmación; tabla por nombre/usuario y búsqueda incremental.
+- Validación con mensajes por campo, resumen visible y corrección sin perder lo escrito.
+  Bloqueo disponible en sesión abierta o durante trabajo, oculto en reposo bloqueado.
+- Contraseñas ocultas por defecto; revelado temporal de 10 segundos en el editor.
+- Generación con `secrets`, longitud 4–128 y categorías permitidas configurables.
+- Fortaleza heurística local y entropía ideal del generador, etiquetadas por separado.
+- Copiado explícito con limpieza condicional tras 20/25/30/60 segundos y al bloquear/cerrar.
+- Navegación lateral entre Mi bóveda y Aprender criptografía, con estado de sesión
+  siempre visible. Laboratorio de cuatro pasos con diagramas, operaciones reales,
+  exploración de entropía y preguntas con devolución.
+
+## Uso de demo
+
+Elegir Crear bóveda, un archivo nuevo y una maestra ficticia con confirmación.
+Agregar dos cuentas, editarlas, buscar, copiar y eliminar confirmando. Bloquear,
+seleccionar Desbloquear y reabrir para verificar persistencia. El laboratorio no
+requiere abrir una bóveda: su ejemplo se ejecuta en memoria y no modifica archivos.
+Entrar a **Aprender criptografía** (o presionar F1), ejecutar un ejemplo y recorrer
+los cuatro pasos numerados. En Entropía, mover la longitud y cambiar el alfabeto.
+En cada paso responder la pregunta; se puede reintentar. Ctrl+L bloquea la bóveda.
+El informe técnico completo queda como consulta opcional, no como interfaz principal.
+
+Cada cambio se confirma después del guardado cifrado. Un conflicto o fallo de
+persistencia bloquea la sesión y requiere reapertura. No abrir la misma bóveda desde
+dos procesos. Sin recuperación de maestra, autolock ni backup manual (estos últimos P1).
+
+## Verificar y generar entregables
 
 ```powershell
-.\.venv\Scripts\ruff.exe check .
-.\.venv\Scripts\python.exe -m pytest
+.venv/Scripts/ruff.exe check .
 $env:VAULTLAB_TEST_GUI = "1"
-.\.venv\Scripts\python.exe -m pytest -m gui
-Remove-Item Env:VAULTLAB_TEST_GUI
+.venv/Scripts/python.exe -m pytest -p no:cacheprovider
+.venv/Scripts/python.exe -m pip check
+.venv/Scripts/python.exe -m vaultlab.crypto.benchmark
 ```
 
-La prueba GUI abre y cierra una ventana real; por defecto se omite explícitamente.
-La revisión manual consiste en iniciar la aplicación, comprobar textos y tamaños,
-redimensionar, acceder por teclado a «Salir» y cerrar sin errores.
-T-005 permite crear o desbloquear una bóveda con maestra oculta y confirmación al crear.
-Es una implementación académica: usar exclusivamente maestras ficticias.
-No se ha completado FR-011: el laboratorio obligatorio P0 sigue visible como pendiente.
+Sin `VAULTLAB_TEST_GUI=1`, las pruebas gráficas se omiten explícitamente.
+La evaluación vigente, con 295 pruebas aprobadas, se documenta en
+[INTERFACE_REPORT.md](docs/INTERFACE_REPORT.md);
+la evaluación anterior, con 275 aprobadas, está en
+[FINAL_REPORT.md](docs/FINAL_REPORT.md). Hubo un fallo intermitente de instalación
+Tk en una corrida; se verificaron los archivos y la repetición con rutas Tk
+explícitas pasó. El informe incluye reproducción y límites de la evaluación.
 
-1. Seleccionar «Crear bóveda» y elegir un archivo nuevo; la ruta inicial es
-   `vault.vault` en la carpeta desde la que se inicia la aplicación.
-2. Introducir y confirmar una maestra ficticia. Los campos se limpian al enviar.
-3. Esperar el progreso: la ventana sigue respondiendo durante derivación y guardado.
-4. Tras el éxito, usar «Bloquear» y luego «Desbloquear» con la misma maestra.
-   Todavía no hay tabla, edición ni copiado de credenciales (tickets posteriores).
-5. Ante error, volver a introducir la maestra; nunca se conserva como preferencia.
-
-«Bloquear» o «Salir» durante el trabajo esperan el bloqueo en el mismo worker.
-No interrumpen una escritura ni eliminan una bóveda que ya llegó a crearse.
-La configuración de ruta no se persiste. Informe y revisión manual sugerida en
-`docs/T005_REPORT.md`; la revisión manual de esta UI fue confirmada por el usuario.
-
-T-002 agrega PBKDF2-HMAC-SHA256 y AES-256-GCM mediante `cryptography`, solo en
-la capa interna. Para repetir la medición con ejemplos ficticios, sin mostrar claves:
+Para Word, PowerPoint y capturas (herramientas opcionales, no necesarias para la app):
 
 ```powershell
-.\.venv\Scripts\python.exe -m vaultlab.crypto.benchmark
+.venv/Scripts/python.exe -m pip install -e ".[docs]"
+.venv/Scripts/python.exe scripts/capture_demo.py
+.venv/Scripts/python.exe scripts/build_deliverables.py
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/package_demo.ps1
 ```
 
-La medición no altera la configuración. Parámetros, límites, AAD y evidencia en
-`docs/SECURITY.md`, `docs/DATA_MODEL.md` y `docs/TEST_PLAN.md`.
+La excepción de ejecución solo afecta ese proceso; no cambia la política del equipo.
+El kit offline requiere Python/Tk ya instalado y versión/arquitectura compatibles con
+los wheels incluidos. No es un `.exe` independiente. Guía: [DEMO_GUIDE.md](docs/DEMO_GUIDE.md).
 
-T-003 incorpora modelos validados, un códec sin estado y `VaultRepository`.
-Solo se escribe el sobre cifrado; la maestra se utiliza en memoria. El repositorio
-no recibe credenciales ni contraseñas y rechaza la creación sobre un archivo existente.
-Informe de alcance, API, pruebas y límites: `docs/T003_REPORT.md`.
-T-005 integra el flujo de creación/apertura en la interfaz sin modificar ese contrato.
+## Entregables y documentación
 
-T-004 agrega `VaultService` con creación, desbloqueo autenticado, bloqueo y consulta
-de snapshot inmutable. `save()` recifra solo ese snapshot, requiere sesión autenticada
-y bloquea ante fallos; no hay todavía CRUD. La maestra no se conserva en la sesión.
-Informe: `docs/T004_REPORT.md`. Uso secuencial; sin garantías de concurrencia.
-T-005 respeta esa condición con un único worker y resultados de estado sin secretos.
+- [Informe final y trazabilidad](docs/FINAL_REPORT.md).
+- [Paper fuente REDDI](docs/PAPER_DRAFT.md) y [diapositivas fuente](docs/SLIDES_DRAFT.md).
+- Borradores Word y PowerPoint en `docs/deliverables/`; capturas reales en `docs/evidence/`.
+- Kit generado: `dist/VaultLab-demo-offline.zip` (artefacto local excluido de Git).
+- [PRD](docs/PRD.md), [seguridad](docs/SECURITY.md), [arquitectura](docs/ARCHITECTURE.md),
+  [datos](docs/DATA_MODEL.md), [decisiones](docs/DECISIONS.md), [backlog](docs/BACKLOG.md).
 
-La documentación del proyecto, `AGENTS.md`, el código y `pyproject.toml` se versionan.
-Se excluyen entornos virtuales, cachés, temporales, compilados, `.env`, bóvedas y claves.
-Nunca incorporar credenciales reales ni datos personales a las pruebas o capturas.
-
-## Fuentes y jerarquía
-1. `2doParcial-Instructivo-Actualizado.pdf`, sección 3.1, punto 4, y requisitos generales (GUI, paper, defensa): **consigna principal**.
-2. `2doParcial-Administrador-Contrasenas.docx`: **consigna específica complementaria**; añade altas/modificaciones/bajas de registros, archivo cifrado y objetivos secundarios. Ante divergencia con el instructivo actualizado, **solicitar aclaración docente**; no eliminar requisitos del instructivo.
-3. `Plantilla-Reddi-trabajos-(1).docx`: **plantilla editorial del paper**.
-4. Documentos de `docs/`: **decisiones propuestas de ingeniería**, no órdenes de la cátedra.
-
-No se incluyen las fuentes originales en este ZIP: el estudiante debe entregárselas a Codex si necesita auditar literalmente las consignas.
-
-## Entregables
-- Aplicación local con GUI moderna, bóveda cifrada, generador aleatorio, indicador de fortaleza, búsqueda y copiado seguro.
-- Pruebas automáticas y manuales demostrables.
-- Paper formato REDDI y presentación con demostración viva (a preparar a partir del software real).
-
-## Cómo usar con Codex
-1. Descomprimir este ZIP en el repositorio de trabajo.
-2. Enviar a Codex `CODEX_HANDOFF.md` y pedirle leer `AGENTS.md` y todos los documentos en `docs/`.
-3. Comenzar por **T-001**, no construir todo de una vez. Codex debe informar pruebas y modificaciones de cada ticket.
-4. Resolver las preguntas abiertas de `docs/DECISIONS.md` antes de cambiar decisiones sensibles.
-
-## Índice
-- `docs/PRD.md` — funcionalidades y criterios de aceptación.
-- `docs/ARCHITECTURE.md` — módulos y dependencias.
-- `docs/SECURITY.md` — modelo de amenazas, cifrado y límites.
-- `docs/DATA_MODEL.md` — formato persistente y modelo lógico.
-- `docs/UX_FLOWS.md` — pantallas y estados.
-- `docs/TEST_PLAN.md` — verificaciones.
-- `docs/BACKLOG.md` — ejecución incremental.
-- `docs/DECISIONS.md` — decisiones, supuestos y dudas.
-- `docs/PAPER_GUIDE.md` — paper y exposición.
+Fuentes docentes declaradas: `2doParcial-Instructivo-Actualizado.pdf`,
+`2doParcial-Administrador-Contrasenas.docx` y `Plantilla-Reddi-trabajos-(1).docx`.
+No estaban presentes en el repositorio recibido: falta cotejar literalmente
+consignas y plantilla, completar autoría/institución y revisar maquetación final.
+Los documentos de docs son transcripciones y decisiones de ingeniería, no nuevas
+exigencias docentes. La autorización actual permite implementar conjuntamente
+T-006 a T-012; no se realizaron commits ni push.

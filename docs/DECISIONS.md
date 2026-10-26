@@ -1,5 +1,95 @@
 # Registro de decisiones y preguntas
 
+## Ejecutable Windows — autorización posterior del usuario
+
+- El usuario autorizó generar el .exe. Se usa PyInstaller 6.22.3 con Python 3.13.5
+  y recursos explícitos de CustomTkinter, archivo único y sin consola. La herramienta
+  de construcción queda en el extra exe, sin agregarse como dependencia de runtime.
+- El binario conserva los algoritmos, parámetros y formato; no incluye bóvedas ni
+  secretos del usuario. Fuentes/temas se recopilan y se verifican desde el binario real.
+- Solo en ejecución frozen, la ruta inicial usa LOCALAPPDATA/VaultLab/vault.vault
+  y se crea su directorio. No se guardan datos en _MEIPASS, el pendrive o el directorio
+  de instalación por defecto. Desde fuentes se conserva cwd/vault.vault.
+- Si LOCALAPPDATA no es absoluto o no existe en el entorno, se usa el perfil del
+  usuario. Un fallo al preparar el directorio no impide elegir otro destino en la GUI.
+- Se agrega un diagnóstico optativo --self-test con fixtures internos y salida
+  de indicadores, sin credenciales ni claves. La verificación retira las referencias
+  al entorno Python y prueba además arranque normal y cierre nativo de la ventana.
+- Artefactos en dist/ y build/, excluidos de Git; scripts y evidencia son versionables.
+  Ejecutable sin firma digital. No se crean commits ni se publica el binario en red.
+
+## Validación visible y bloqueo contextual — solicitud posterior del usuario
+
+- Se agregan errores específicos por campo en el editor: obligatorios, límites
+  y texto no UTF-8, con borde resaltado, mensaje local y resumen fijo por encima
+  del scroll. Se lleva foco y desplazamiento al primer error. Los datos válidos
+  se conservan y no se envía una mutación hasta corregir el formulario.
+- Al corregir un campo se retira su aviso; el generador y el copiado también
+  explican entradas faltantes o inválidas. Los mensajes nunca repiten contraseñas.
+- El acceso distingue archivo vacío, maestra vacía, confirmación faltante y errores
+  ya controlados por encode_master. Sus avisos aparecen arriba del formulario;
+  se conserva la limpieza previa de campos maestros ante error.
+- Los botones de bloqueo del acceso y menú lateral se ocultan cuando ya se está
+  bloqueado y no hay trabajo. Durante una operación se mantienen como Bloquear al
+  terminar; en una sesión abierta conservan su acción normal. Ctrl+L en reposo
+  bloqueado no inicia trabajo ni cambia la navegación.
+
+## Rediseño didáctico e interfaz — autorización posterior del usuario
+
+- El usuario solicitó implementar un recorrido didáctico y mejorar navegación,
+  dinamismo y diseño. El laboratorio anterior, aunque calculaba resultados reales,
+  dependía de un bloque de texto y se encontraba al final del acceso: se reemplaza
+  como experiencia principal por una página dedicada con cuatro pasos navegables.
+- Menú lateral persistente, estado global, errores visibles en cualquier página,
+  formularios en tarjetas y editor desplazable. F1 abre aprendizaje y Ctrl+L bloquea.
+- Cada paso explica idea, diagrama, símbolos, operaciones calculadas y conclusión;
+  incluye una pregunta con feedback y reintento. Entropía tiene longitud y alfabeto
+  interactivos. El detalle técnico sigue disponible como consulta opcional.
+- Dos fixtures internos seleccionables; no se aceptan maestras ni datos de usuario
+  en el laboratorio. Se muestran ciphertext y tag ficticios, sal/nonce públicos,
+  tiempos reales y bytes de la alteración; nunca maestra, U ni clave derivada.
+- `LabReport.steps` contiene solo material de demostración. Se mantienen PBKDF2,
+  AES-GCM, coste y formato de bóveda sin cambios. La aritmética de la traza reducida
+  es didáctica; el cifrado continúa realizado por cryptography.
+- Cambiar ejemplo invalida resultados anteriores. La navegación sigue habilitada
+  durante el cálculo y terminar una operación no cambia la página que eligió el usuario.
+- Destruir vistas cancela polling y cierra executors explícitamente: el evento Destroy
+  de CTkFrame puede delegarse al canvas y no debe usarse para identificar el frame por `is`.
+- Se eleva el tamaño mínimo de ventana a 960×700 para mantener legibles las dos áreas;
+  cada página y el editor disponen de desplazamiento vertical.
+
+## Decisiones vigentes T-006–T-012 — 2026-10-25
+
+- El usuario autorizó implementar conjuntamente todos los tickets restantes y
+  evaluarlos. Esta autorización prevalece sobre D-007 y la política anterior de
+  aprobación individual; no autoriza commits ni publicación.
+- Se conservan algoritmo, coste, AAD, formato v1 y repositorio de T-002/T-003.
+  Las mutaciones validan un candidato inmutable y lo publican después de persistir.
+  Un error de entrada conserva sesión; un fallo de persistencia o conflicto bloquea.
+- El worker sigue siendo dueño exclusivo del servicio. La cola incorpora una
+  respuesta explícita de bóveda, con metadatos de tabla y detalle solo a pedido;
+  los campos sensibles no aparecen en repr. No se transportan claves ni maestra.
+  Se descartan generaciones obsoletas incluso con resultados de copiado pendientes.
+- Generación uniforme sobre unión sin duplicados de categorías permitidas; no se
+  promete presencia de todas. H=L log₂|A| es exacta bajo ese proceso ideal y no
+  estima entropía humana. El medidor es una heurística de longitud y patrones.
+- El laboratorio no recibe sesión ni ruta. Usa constantes ficticias internas,
+  sal/nonce nuevos y bibliotecas existentes; muestra fórmulas, tamaños y resultados
+  comprobables, nunca claves ni U. Esto resuelve la contradicción de FR-011 sobre
+  salida ficticia visible frente a la prohibición de mostrar claves: se expone
+  la longitud y la verificación de la salida, no sus bytes. Traza c=2 solo didáctica;
+  experimento completo con el coste inicial, sin reducir seguridad de archivos.
+- Portapapeles: 25 s iniciales, opciones 20/25/30/60; limpieza condicional al vencer,
+  bloquear o cerrar. Comparar y limpiar no es una operación atómica entre procesos.
+- T-011 se empaqueta como wheel + dependencias en ZIP, con Python/Tk previo;
+  no se promete un ejecutable autónomo ni compatibilidad de wheels entre versiones.
+- T-012 produce borradores Word/PowerPoint además de fuentes Markdown y capturas
+  reales. Sin originales docentes, autoría o institución no se declara entrega final
+  ajustada a la plantilla. Las referencias se verificaron en fuentes primarias.
+- Autolock y backup manual permanecen P1 fuera del backlog P0 autorizado.
+- Las decisiones y cierres de abajo son registros históricos; el estado actual
+  se consulta en FINAL_REPORT.md.
+
 ## Confirmadas por fuente docente
 - SRC-01: Es obligatorio software funcional con GUI moderna y didáctica.
 - SRC-02: Tema 4: bóveda cifrada con algoritmo simétrico robusto derivado de contraseña maestra con PBKDF2 o Argon2; medidor de fortaleza, generador aleatorio, tabla/búsqueda/copiado seguro.

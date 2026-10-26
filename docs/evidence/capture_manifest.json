@@ -1,0 +1,16 @@
+{
+  "method": "Windows PrintWindow; ventanas Tk reales; sin escritorio",
+  "fixtures": "Datos ficticios temporales eliminados al salir",
+  "images": [
+    "01-acceso.png",
+    "02-boveda.png",
+    "03-generador.png",
+    "04-laboratorio.png",
+    "05-cifrado.png",
+    "06-entropia.png",
+    "07-integridad.png",
+    "08-tamano-minimo.png",
+    "09-preguntas.png",
+    "10-validacion-credencial.png"
+  ]
+}

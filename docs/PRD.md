@@ -1,5 +1,12 @@
 # PRD — VaultLab v1.0 (borrador)
 
+Evaluación vigente: FR-001–FR-011 y FR-013 implementados y probados; evidencia
+detallada en FINAL_REPORT.md. FR-012 parcialmente cubierto (acción/cierre; sin
+inactividad automática). FR-014 sin implementar, mejora P1. La verificación de GUI
+automatizada y capturas no reemplaza el ensayo humano en el equipo de exposición.
+En FR-011 se muestra longitud y verificación de la salida ficticia, sin bytes de
+clave, conforme a la resolución de seguridad registrada en DECISIONS.md.
+
 ## 1. Problema y objetivo
 Un usuario necesita conservar credenciales bajo una contraseña maestra y comprender cómo la matemática criptográfica las protege. Construir aplicación offline con interfaz moderna que ofrezca cifrado autenticado, gestión de registros, generador de contraseñas y feedback visual.
 

@@ -1,5 +1,9 @@
 # Backlog ejecutable — un ticket a la vez
 
+Mejora posterior autorizada por el usuario: rediseño de navegación y laboratorio
+didáctico de cuatro pasos, sin nuevos tickets ni cambios al formato criptográfico.
+Implementación y evaluación vigente: [INTERFACE_REPORT.md](INTERFACE_REPORT.md).
+
 | Ticket | Prioridad | Dependencias | Alcance | Salida verificable |
 |---|---|---|---|---|
 | T-001 | P0 | — | Bootstrap: pyproject, estructura src, typing, ruff, pytest, .gitignore, README de ejecución, ventana base CustomTkinter | `ruff`, `pytest`, GUI inicia localmente |
@@ -39,4 +43,20 @@
   confirmada por el usuario; vistas de acceso,
   worker serial, progreso, errores y bloqueo/cierre coordinados. Evidencia en
   T005_REPORT.md. Cierre y commit/push autorizados tras verificaciones satisfactorias.
-- T-006 y siguientes: no iniciados; requieren nueva autorización explícita.
+- T-006–T-012: autorizados conjuntamente por el usuario el 2026-10-25.
+  Esa instrucción sustituye para esta ejecución la política de un ticket por vez.
+  T-006–T-011 implementados y verificados; T-012 entrega borradores editables,
+  referencias y capturas reales, con validación editorial docente pendiente.
+  Sin commits ni push. Estado vigente: [FINAL_REPORT.md](FINAL_REPORT.md).
+
+## Evidencia de la ejecución conjunta
+
+| Ticket | Resultado |
+|---|---|
+| T-006 | CRUD transaccional, tabla y búsqueda nombre/usuario; reapertura y fallos probados |
+| T-007 | secrets.choice, categorías permitidas y longitud 4–128; combinaciones probadas |
+| T-008 | Medidor local heurístico; entropía ideal solo para generador uniforme |
+| T-009 | Copiado explícito, plazo seleccionable y limpieza condicional; prueba Tk real |
+| T-010 | Dashboard matemático y experimento aislado con referencia y alteración real |
+| T-011 | Suite completa, guía, wheel y ZIP offline con instalación y smoke test |
+| T-012 | Paper .md/.docx y defensa .md/.pptx; capturas reales; falta cotejar plantilla original |

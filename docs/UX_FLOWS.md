@@ -1,5 +1,35 @@
 # UX, vistas y flujos
 
+## Estado vigente
+
+Mejora posterior de feedback: el editor muestra errores debajo de cada campo y
+un resumen fijo fuera del scroll. El primer campo inválido recibe foco; se conservan
+los demás valores y se permite corregir sin reiniciar el formulario. El acceso
+muestra también sus avisos al inicio. Generador distingue longitud no entera, fuera
+de rango y ausencia de categorías. Los controles de bloqueo solo se muestran en
+sesión abierta o durante trabajo, donde indican Bloquear al terminar.
+
+La versión actual usa menú lateral: Mi bóveda y Aprender criptografía, sin desplazar
+la pantalla hasta un laboratorio escondido. El recorrido tiene cuatro pasos con
+diagramas, operaciones verificadas, conclusiones y preguntas; el explorador de
+entropía recalcula longitud y alfabeto en vivo. F1 abre el laboratorio; Ctrl+L bloquea.
+Los formularios se vacían al navegar y las ediciones sin guardar se cierran.
+Los errores de operaciones se muestran también en la cabecera global. La navegación
+no queda bloqueada mientras se calcula; el resultado no cambia la página elegida.
+Ventana mínima 960×700; páginas y editor con scroll. Evidencia en INTERFACE_REPORT.md.
+
+Implementados A–H: tabla buscable por nombre/usuario con navegación de Tk,
+editor modal, confirmación de borrado, generación configurable, medidor heurístico,
+copiado y plazo de limpieza seleccionable. Contraseña oculta; revelado temporal
+de 10 s. Cada mutación muestra procesamiento y confirma solo después de persistir.
+Al fallar un guardado la vista se limpia y solicita volver a desbloquear.
+
+El botón permanente de cabecera desplaza al Laboratorio Criptográfico, disponible
+también con bóveda bloqueada. El dashboard despliega resultados calculados sobre
+datos ficticios aislados; no se exportan secretos ni se toca la bóveda desde él.
+Capturas reales y guía: PAPER_DRAFT.md y DEMO_GUIDE.md.
+Las descripciones limitadas a T-005 que siguen son históricas.
+
 ## Principios
 GUI en español, sobria, modernidad sin sacrificar claridad; modo oscuro o esquema consistente, tamaños legibles, feedback claro, foco por teclado y formularios accesibles. Mostrar metadatos didácticos sin divulgar secretos.
 

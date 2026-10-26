@@ -1,0 +1,7 @@
+{
+  "wheel_installed": true,
+  "offline_crud_reopen": true,
+  "laboratory": true,
+  "gui_render_close": true,
+  "python": "3.13.5"
+}
